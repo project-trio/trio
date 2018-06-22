@@ -4,10 +4,10 @@ module.exports = {
 
 	devServer: {
 		open: true,
-		port: 8060,
+		port: 8030,
 		proxy: {
-			'/api': {
-				target: 'http://192.168.0.11:8061',
+			'/socket.io': {
+				target: 'http://192.168.0.11:8031',
 				changeOrigin: true,
 			},
 		},
