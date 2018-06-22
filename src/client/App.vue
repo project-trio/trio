@@ -1,21 +1,12 @@
 <template>
 <div id="app">
-	<div v-if="loading">
-		Loading...
-	</div>
-	<router-view v-else class="content" />
+	<router-view class="content" />
 </div>
 </template>
 
 <script>
 export default {
 	components: {
-	},
-
-	computed: {
-		loading () {
-			return this.$store.state.loading
-		},
 	},
 }
 </script>
@@ -46,6 +37,11 @@ export default {
 	color #9
 
 //CONTROLS
+
+fieldset
+	border none
+	margin 0
+	padding 0
 
 .big
 	display block

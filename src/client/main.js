@@ -9,13 +9,13 @@ Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
 	const toName = to.name
-	const hasEmail = !!store.state.email
+	const signedIn = !!store.state.sessionToken
 	if (toName === 'Signin') {
-		if (hasEmail) {
+		if (signedIn) {
 			return next({ name: 'Home' })
 		}
 	} else {
-		if (!hasEmail) {
+		if (!signedIn) {
 			return next({ name: 'Signin' })
 		}
 	}
