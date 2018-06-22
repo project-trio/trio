@@ -4,10 +4,17 @@
 	"private": true,
 	"scripts": {
 		"serve": "vue-cli-service serve",
-		"build": "vue-cli-service build",
+		"start": "node src/server/index.js",
+		"build": "vue-cli-service build --modern",
 		"lint": "vue-cli-service lint"
 	},
 	"dependencies": {
+		"@sendgrid/mail": "^6.3.1",
+		"bluebird": "^3.5.1",
+		"dotenv": "^6.0.0",
+		"express": "^4.16.3",
+		"pg-promise": "^8.4.4",
+		"socket.io": "^2.1.1"
 	},
 	"devDependencies": {
 		"@vue/cli-plugin-babel": "^3.0.0-beta.15",
