@@ -25,6 +25,8 @@ export default new Vuex.Store({
 		loading: 0,
 		email: storage.get('email'),
 		sessionToken: storage.get('token'),
+
+		activities: null,
 	},
 
 	actions: {
@@ -34,6 +36,12 @@ export default new Vuex.Store({
 				if (response.token) {
 					commit('SET_SESSION', response.token)
 				}
+			})
+		},
+
+		JOIN_HOME ({ commit}) {
+			send(commit, 'join home', null, (response) => {
+				commit('ACTIVITIES', response.activities)
 			})
 		},
 	},
@@ -54,6 +62,10 @@ export default new Vuex.Store({
 			state.sessionToken = token
 			storage.set('token', token)
 			router.replace({ name: 'Home' })
+		},
+
+		ACTIVITIES (state, activities) {
+			state.activities = activities
 		},
 	},
 
