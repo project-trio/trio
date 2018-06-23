@@ -13,7 +13,7 @@ export default {
 
 <style lang="stylus">
 #app
-	font-family 'Avenir', Helvetica, Arial, sans-serif
+	font-family -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif
 	-webkit-font-smoothing antialiased
 	-moz-osx-font-smoothing grayscale
 	color #2
@@ -43,11 +43,13 @@ fieldset
 	margin 0
 	padding 0
 
+button, textarea, input
+	outline none
+
 .big
 	display block
-	margin 8px auto
+	margin 8px auto !important
 	max-width 100%
-	text-align center
 	box-sizing border-box
 
 input.big
@@ -56,6 +58,18 @@ input.big
 	font-size 24px
 	border 1px solid #d
 	border-radius 3px
+	text-align center
+
+textarea.big
+	width 100%
+	resize vertical
+	min-height 48px
+	max-height 256px
+	border 1px solid #e8
+	border-radius 5px
+	text-align left
+	font-size inherit
+	padding 3px 6px
 
 .interactive, button
 	transition-property background, color, opacity
@@ -65,14 +79,16 @@ input.big
 button
 	cursor pointer
 	&:hover
-		opacity 0.8
+		opacity 0.7
+		&:active
+			opacity 0.4
 
 button.big
 	width 256px
 	box-sizing border-box
 	height 44px
 	font-size 24px
-	background #e
+	background #e8
 	border-radius 3px
 	border none
 </style>

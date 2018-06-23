@@ -1,12 +1,15 @@
 <template>
 <div class="home">
-	<h1>hello</h1>
+	<CreateActivity />
 </div>
 </template>
 
 <script>
+import CreateActivity from '@/client/components/CreateActivity'
+
 export default {
 	components: {
+		CreateActivity,
 	},
 }
 </script>
