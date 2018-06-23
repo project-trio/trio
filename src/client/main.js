@@ -5,6 +5,8 @@ import App from './App.vue'
 import router from '@/client/vue/router'
 import store from '@/client/vue/store'
 
+require('vue-multiselect/dist/vue-multiselect.min.css')
+
 Vue.config.productionTip = false
 
 router.beforeEach((to, from, next) => {
