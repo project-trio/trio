@@ -1,20 +1,80 @@
+const { now } = require.main.require('../common/utils')
+const User = require.main.require('./models/user')
+
 let three
 
+let activities = []
+let users = {}
+
 module.exports = {
-	activities: [],
+
+	activities () {
+		return activities
+	},
+
+	users () {
+		return users
+	},
 
 	async init (io) {
 		three = io.of('/three')
 		const Activity = require.main.require('./models/activity')
-		this.activities = await Activity.latest()
+		activities = await Activity.latest()
+
+		const userIds = new Set()
+		for (const activity of activities) {
+			userIds.add(activity.user_id)
+			if (activity.target_type === 'user') {
+				userIds.add(activity.target_id)
+			}
+		}
+		const allIds = Array.from(userIds)
+		const activityUsers = await User.all(allIds, true)
+		for (let index = allIds.length - 1; index >= 0; index -= 1) {
+			const id = allIds[index]
+			users[id] = activityUsers[index]
+		}
 	},
 
-	addActivity (activity) {
-		this.activities.unshift(activity)
-		if (this.activities.length >= 100) {
-			this.activities.pop()
+	async addActivity (user, activity) {
+		activities.unshift(activity)
+		if (activities.length >= 100) {
+			activities.pop()
+		}
+		const currentTime = now()
+		if (currentTime - user.at > 30 * 1000) {
+			user.at = currentTime
+			three.in('home').emit('user', user)
 		}
 		three.in('home').emit('activity', activity)
+	},
+
+	updateUser (user) {
+		const existingUser = users[user.id]
+		if (existingUser) {
+			existingUser.at = user.at
+			if (!existingUser.online) {
+				existingUser.online = 1
+			} else {
+				existingUser.online += 1
+			}
+			user = existingUser
+		} else {
+			user.online = 1
+			users[user.id] = {
+				email: user.email,
+				at: user.at,
+			}
+		}
+		three.in('home').emit('user', user)
+		return user
+	},
+
+	disconnect (user) {
+		user.online -= 1
+		if (user.online === 0) {
+			three.in('home').emit('user', user)
+		}
 	},
 
 }

@@ -1,3 +1,4 @@
+const global = require.main.require('./helpers/global')
 const middleware = require.main.require('./helpers/middleware')
 
 const home = require('./home')
@@ -9,5 +10,8 @@ module.exports = (io) => {
 			signin(socket)
 		}
 		home(socket)
+		socket.on('disconnect', () => {
+			global.disconnect(socket.user)
+		})
 	})
 }

@@ -1,3 +1,5 @@
+const global = require.main.require('./helpers/global')
+
 const Session = require.main.require('./models/session')
 const User = require.main.require('./models/user')
 
@@ -18,7 +20,7 @@ const auth = async (socket, next) => {
 			if (!user) {
 				return authError(next, 'signin user')
 			}
-			socket.user = user
+			socket.user = global.updateUser(user)
 		} catch (error) {
 			console.log(error)
 			return authError(next, 'signin error')
