@@ -20,5 +20,8 @@ socket.on('error', (error) => {
 socket.on('activity', (activity) => {
 	store.commit('ACTIVITY', activity)
 })
+socket.on('user', (user) => {
+	store.commit('USER', user)
+})
 
 export default socket

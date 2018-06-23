@@ -27,6 +27,7 @@ export default new Vuex.Store({
 		sessionToken: storage.get('token'),
 
 		activities: null,
+		users: {},
 	},
 
 	actions: {
@@ -42,6 +43,7 @@ export default new Vuex.Store({
 		JOIN_HOME ({ commit}) {
 			send(commit, 'join home', null, (response) => {
 				commit('ACTIVITIES', response.activities)
+				commit('USERS', response.users)
 			})
 		},
 	},
@@ -70,6 +72,15 @@ export default new Vuex.Store({
 		ACTIVITY (state, activity) {
 			if (state.activities) {
 				state.activities.unshift(activity)
+			}
+		},
+
+		USERS (state, users) {
+			state.users = users
+		},
+		USER (state, user) {
+			if (state.users) {
+				Vue.set(state.users, user.id, user)
 			}
 		},
 	},
