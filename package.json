@@ -6,6 +6,7 @@
 		"serve": "vue-cli-service serve",
 		"start": "node src/server/index.js",
 		"build": "vue-cli-service build --modern",
+		"schema": "pg_dump --schema-only --no-owner --no-privileges trio | sed -e '/^--/d' -e '/^SET/d' -e '/^COMMENT ON/d' -e 's/    /\t/g' | sed '/^$/N;/^\\n$/D' > db.sql",
 		"lint": "vue-cli-service lint"
 	},
 	"dependencies": {
