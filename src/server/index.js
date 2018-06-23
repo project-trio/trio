@@ -10,21 +10,17 @@ const path = require('path')
 const app = express()
 const http = require('http').createServer(app)
 
-//HYDRATE
-
-const global = require.main.require('./helpers/global')
-
-async function init () {
-	const Activity = require.main.require('./models/activity')
-	global.activities = await Activity.latest()
-}
-init()
-
 //SOCKET.IO
 
 const io = require('socket.io')(http)
 
 require('./app/three')(io)
+
+//HYDRATE
+
+const global = require.main.require('./helpers/global')
+
+global.init(io)
 
 //APP
 

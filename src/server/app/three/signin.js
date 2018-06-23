@@ -46,12 +46,11 @@ const emailSignin = async (socket, user, email, callback) => {
 		if (validationError) {
 			return callback({ error: validationError, cancel: undefined })
 		}
-		let user
 		try {
 			user = await User.create(email)
-			await Activity.create(user, { action: 'create' })
+			Activity.create(user, { action: 'create' })
 		} catch (error) {
-			console.log(error)
+			return console.log(error)
 		}
 		await makeSession(socket, user, callback)
 	}

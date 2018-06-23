@@ -37,6 +37,7 @@ module.exports = {
 		const namespace = io.of(`/${name}`)
 		namespace.use(auth)
 		namespace.on('connection', callback)
+		return namespace
 	},
 
 	page (socket, page, pageCallback) {

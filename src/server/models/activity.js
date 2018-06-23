@@ -1,12 +1,15 @@
 const db = require.main.require('./helpers/db')
+const global = require.main.require('./helpers/global')
 
 const PUBLIC_FIELDS = 'id, user_id, body, created_at, updated_at, target_id, target_type, reply_id, action'
 
 module.exports = {
 
-	create (user, data) {
+	async create (user, data) {
 		data.user_id = user.id
-		return db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:csv]) RETURNING ${PUBLIC_FIELDS}`, data)
+		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:csv]) RETURNING ${PUBLIC_FIELDS}`, data)
+		global.addActivity(activity)
+		return activity
 	},
 
 	update (id, body) {
