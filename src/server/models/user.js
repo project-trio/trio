@@ -2,13 +2,14 @@ const { randomRange } = require.main.require('../common/utils')
 
 const db = require.main.require('./helpers/db')
 
-const FIELDS = 'id, email, EXTRACT(EPOCH FROM updated_at) AS at, passcode, EXTRACT(EPOCH FROM passcode_at) AS passcode_at, passcode_attempts, email_status, email_change'
-const PUBLIC_FIELDS = 'id, email, EXTRACT(EPOCH FROM updated_at) AS at'
+const PUBLIC_FIELDS = 'id, name, ccid, md5, EXTRACT(EPOCH FROM updated_at) AS at'
+const FIELDS = `${PUBLIC_FIELDS}, email, passcode, EXTRACT(EPOCH FROM passcode_at) AS passcode_at, passcode_attempts, email_status, email_change`
 
 module.exports = {
 
-	create (email, _userType, _settings) {
-		return db.one('INSERT INTO users(email) VALUES($1) RETURNING id', [ email ])
+	create (email, name, ccid, md5) {
+		const data = { email, name, ccid, md5 }
+		return db.one('INSERT INTO users($[this:name]) VALUES($[this:csv]) RETURNING id', data)
 	},
 
 	from (paramType, paramValue, publicFields) {
