@@ -42,7 +42,9 @@ module.exports = {
 			callback(socket)
 
 			socket.on('disconnect', () => {
-				global.disconnect(socket.user)
+				if (socket.user) {
+					global.disconnect(socket.user)
+				}
 			})
 		})
 		return namespace
