@@ -3,6 +3,7 @@ const { now } = require.main.require('../common/utils')
 
 const mailer = require.main.require('./helpers/mailer')
 
+const Activity = require.main.require('./models/activity')
 const User = require.main.require('./models/user')
 const Session = require.main.require('./models/session')
 
@@ -45,8 +46,14 @@ const emailSignin = async (socket, user, email, callback) => {
 		if (validationError) {
 			return callback({ error: validationError, cancel: undefined })
 		}
-		const user = await User.create(email)
-		return await makeSession(socket, user, callback)
+		let user
+		try {
+			user = await User.create(email)
+			await Activity.create(user, { action: 'create' })
+		} catch (error) {
+			console.log(error)
+		}
+		await makeSession(socket, user, callback)
 	}
 
 	if (email && user.email_status) {
