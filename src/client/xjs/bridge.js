@@ -12,6 +12,17 @@ if (token) {
 
 const socket = io('/three', { query })
 
+socket.on('disconnect', () => {
+	console.log('disconnected')
+	store.commit('RECONNECT', 0)
+})
+socket.on('reconnecting', (attemptNumber) => {
+	store.commit('RECONNECT', attemptNumber)
+})
+socket.on('reconnect', () => {
+	store.commit('RECONNECT', null)
+})
+
 socket.on('error', (error) => {
 	console.log(error)
 	store.commit('LOADING', false)

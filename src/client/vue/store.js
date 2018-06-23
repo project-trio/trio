@@ -23,6 +23,7 @@ export default new Vuex.Store({
 
 	state: {
 		loading: 0,
+		reconnectAttempts: null,
 		email: storage.get('email'),
 		sessionToken: storage.get('token'),
 
@@ -49,6 +50,10 @@ export default new Vuex.Store({
 	},
 
 	mutations: {
+		RECONNECT (state, attempts) {
+			state.reconnectAttempts = attempts
+		},
+
 		LOADING (state, loading) {
 			state.loading += loading ? 1 : -1
 		},

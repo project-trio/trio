@@ -1,5 +1,8 @@
 <template>
 <div id="app">
+	<div v-if="reconnectAttempts !== null" class="overlay">
+		<h1 class="text-center">{{ reconnectAttempts }} attempts to reconnect</h1>
+	</div>
 	<router-view class="content" />
 </div>
 </template>
@@ -7,6 +10,12 @@
 <script>
 export default {
 	components: {
+	},
+
+	computed: {
+		reconnectAttempts () {
+			return this.$store.state.reconnectAttempts
+		},
 	},
 }
 </script>
@@ -24,6 +33,16 @@ export default {
 	width 640px
 	max-width 100%
 	margin auto
+
+.overlay
+	position fixed
+	top 0
+	left 0
+	right 0
+	bottom 0
+	z-index 9001
+	background rgba(#f, 0.5)
+	color #e33
 
 //LAYOUT
 
