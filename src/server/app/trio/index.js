@@ -5,7 +5,7 @@ const home = require('./home')
 const signin = require('./signin')
 
 module.exports = (io) => {
-	return middleware.namespace(io, 'three', (socket) => {
+	return middleware.namespace(io, 'trio', (socket) => {
 		if (!socket.user) {
 			signin(socket)
 		}

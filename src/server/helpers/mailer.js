@@ -9,7 +9,7 @@ const sendSendgrid = (message, multi, templateId, onSuccess, onError) => {
 	if (!message.substitutions) {
 		message.substitutions = {}
 	}
-	message.from = 'threecommunity@gmail.com'
+	message.from = 'triocommunity@gmail.com'
 	message.substitutions.base_url = CommonConsts.BASE_URL
 	message.templateId = templateId
 	sendgridMail.send(message, multi)

@@ -1,7 +1,7 @@
 const { now } = require.main.require('../common/utils')
 const User = require.main.require('./models/user')
 
-let three
+let trio
 
 let activities = []
 let users = {}
@@ -17,7 +17,7 @@ module.exports = {
 	},
 
 	async init (io) {
-		three = io.of('/three')
+		trio = io.of('/trio')
 		const Activity = require.main.require('./models/activity')
 		activities = await Activity.latest()
 
@@ -44,9 +44,9 @@ module.exports = {
 		const currentTime = now()
 		if (currentTime - user.at > 30 * 1000) {
 			user.at = currentTime
-			three.in('home').emit('user', user)
+			trio.in('home').emit('user', user)
 		}
-		three.in('home').emit('activity', activity)
+		trio.in('home').emit('activity', activity)
 	},
 
 	updateUser (user) {
@@ -66,14 +66,14 @@ module.exports = {
 				at: user.at,
 			}
 		}
-		three.in('home').emit('user', user)
+		trio.in('home').emit('user', user)
 		return user
 	},
 
 	disconnect (user) {
 		user.online -= 1
 		if (user.online === 0) {
-			three.in('home').emit('user', user)
+			trio.in('home').emit('user', user)
 		}
 	},
 

@@ -10,7 +10,7 @@ if (token) {
 	query.token = token
 }
 
-const socket = io('/three', { query })
+const socket = io('/trio', { query })
 
 socket.on('disconnect', () => {
 	console.log('disconnected')

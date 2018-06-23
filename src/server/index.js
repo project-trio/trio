@@ -14,7 +14,7 @@ const http = require('http').createServer(app)
 
 const io = require('socket.io')(http)
 
-require('./app/three')(io)
+require('./app/trio')(io)
 
 //HYDRATE
 
@@ -36,4 +36,4 @@ const port = process.env.PORT || CommonConsts.PORT
 
 http.listen(port)
 
-console.log(`three running on port ${port}`, '\n')
+console.log(`Trio running on port ${port}`, '\n')
