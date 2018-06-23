@@ -3,7 +3,9 @@
 	<div v-if="reconnectAttempts !== null" class="overlay">
 		<h1 class="text-center">{{ reconnectAttempts }} attempts to reconnect</h1>
 	</div>
-	<router-view class="content" />
+	<div class="container">
+		<router-view class="content" />
+	</div>
 </div>
 </template>
 
@@ -21,6 +23,9 @@ export default {
 </script>
 
 <style lang="stylus">
+body
+	margin 0
+
 #app
 	font-family -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif
 	-webkit-font-smoothing antialiased
@@ -29,10 +34,15 @@ export default {
 
 //PAGE
 
-.content
+.container
 	width 640px
 	max-width 100%
 	margin auto
+	box-sizing border-box
+	padding 8px
+
+.content
+	width 100%
 
 .overlay
 	position fixed
@@ -45,6 +55,9 @@ export default {
 	color #e33
 
 //LAYOUT
+
+.inline
+	display inline-block
 
 .text-center
 	text-align center
@@ -61,6 +74,9 @@ fieldset
 	border none
 	margin 0
 	padding 0
+	width 100%
+	max-width 100%
+	box-sizing border-box
 
 button, textarea, input
 	outline none
@@ -94,6 +110,10 @@ textarea.big
 	transition-property background, color, opacity
 	transition-duration 350ms
 	transition-timing-function ease-out
+
+fieldset:disabled *
+	cursor not-allowed !important
+	opacity 0.5 !important
 
 button
 	cursor pointer

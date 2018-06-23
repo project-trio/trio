@@ -26,17 +26,19 @@ export default new Vuex.Store({
 		reconnectAttempts: null,
 		email: storage.get('email'),
 		sessionToken: storage.get('token'),
+		registering: false,
 
 		activities: null,
 		users: {},
 	},
 
 	actions: {
-		SIGNIN ({ commit }, { email, passcode }) {
-			send(commit, 'signin', { email, passcode }, (response) => {
-				commit('SET_EMAIL', { email, save: passcode })
-				if (response.token) {
-					commit('SET_SESSION', response.token)
+		SIGNIN ({ commit }, data) {
+			send(commit, 'signin', data, (response) => {
+				const signinToken = response.token
+				commit('SET_EMAIL', { email: data.email, save: signinToken, registering: !!response.register })
+				if (signinToken) {
+					commit('SET_SESSION', signinToken)
 				}
 			})
 		},
@@ -58,8 +60,11 @@ export default new Vuex.Store({
 			state.loading += loading ? 1 : -1
 		},
 
-		SET_EMAIL (state, { email, save }) {
+		SET_EMAIL (state, { email, save, registering }) {
 			state.email = email
+			if (save || registering) {
+				state.registering = registering
+			}
 			if (save) {
 				storage.set('email', email)
 			}

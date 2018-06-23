@@ -25,7 +25,8 @@ socket.on('reconnect', () => {
 
 socket.on('error', (error) => {
 	console.log(error)
-	store.commit('LOADING', false)
+	storage.clear()
+	window.location.reload(true)
 })
 
 socket.on('activity', (activity) => {

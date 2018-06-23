@@ -13,12 +13,13 @@ export default {
 	computed: {
 		avatarUrl () {
 			const pixelSize = this.size * window.devicePixelRatio
+			const smallSize = pixelSize <= 48
 			if (this.ccid) {
-				return `http://storage.cloud.casualcollective.com/avatars/${Math.ceil(this.ccid / 5000)}/${this.ccid}${pixelSize <= 48 ? 't' : ''}.jpg`
+				return `http://storage.cloud.casualcollective.com/avatars/${Math.ceil(this.ccid / 5000)}/${this.ccid}${smallSize ? 't' : ''}.jpg`
 			}
-			const fallback = 'http://storage.cloud.casualcollective.com/avatars/avatar_small.png'
+			const fallback = `http://storage.cloud.casualcollective.com/avatars/avatar_${smallSize ? 'small' : 'large'}.png`
 			if (this.md5) {
-				return `https://www.gravatar.com/avatar/${this.md5}?s=${pixelSize}&${encodeURIComponent(fallback)}`
+				return `https://www.gravatar.com/avatar/${this.md5}?s=${pixelSize}&d=${encodeURIComponent(fallback)}`
 			}
 			return fallback
 		},
