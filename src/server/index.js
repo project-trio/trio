@@ -10,13 +10,19 @@ const path = require('path')
 const app = express()
 const http = require('http').createServer(app)
 
-const middleware = require.main.require('./helpers/middleware')
+//HYDRATE
+
+const global = require.main.require('./helpers/global')
+
+async function init () {
+	const Activity = require.main.require('./models/activity')
+	global.activities = await Activity.latest()
+}
+init()
 
 //SOCKET.IO
 
 const io = require('socket.io')(http)
-
-io.use(middleware.auth)
 
 require('./app/three')(io)
 

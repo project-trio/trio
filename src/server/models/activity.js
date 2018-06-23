@@ -1,10 +1,12 @@
 const db = require.main.require('./helpers/db')
 
+const PUBLIC_FIELDS = 'id, user_id, body, created_at, updated_at, target_id, target_type, reply_id, action'
+
 module.exports = {
 
 	create (user, data) {
 		data.user_id = user.id
-		return db.one('INSERT INTO user_activities(${this:name}) VALUES(${this:csv}) RETURNING id', data)
+		return db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:csv]) RETURNING ${PUBLIC_FIELDS}`, data)
 	},
 
 	update (id, body) {
@@ -12,7 +14,7 @@ module.exports = {
 	},
 
 	latest () {
-		return db.manyOrNone(`SELECT id, user_id, body, created_at, updated_at, target_id, target_type, reply_id, action FROM user_activities ORDER BY updated_at DESC LIMIT 100`)
+		return db.manyOrNone(`SELECT ${PUBLIC_FIELDS} FROM user_activities ORDER BY updated_at DESC LIMIT 100`)
 	},
 
 	delete (id) {

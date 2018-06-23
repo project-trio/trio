@@ -1,9 +1,13 @@
+const middleware = require.main.require('./helpers/middleware')
+
+const home = require('./home')
 const signin = require('./signin')
 
 module.exports = (io) => {
-	io.of('/three').on('connection', (socket) => {
+	middleware.namespace(io, 'three', (socket) => {
 		if (!socket.user) {
 			signin(socket)
 		}
+		home(socket)
 	})
 }
