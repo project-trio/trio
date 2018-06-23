@@ -67,6 +67,11 @@ export default new Vuex.Store({
 		ACTIVITIES (state, activities) {
 			state.activities = activities
 		},
+		ACTIVITY (state, activity) {
+			if (state.activities) {
+				state.activities.unshift(activity)
+			}
+		},
 	},
 
 	getters: {

@@ -17,4 +17,8 @@ socket.on('error', (error) => {
 	store.commit('LOADING', false)
 })
 
+socket.on('activity', (activity) => {
+	store.commit('ACTIVITY', activity)
+})
+
 export default socket
