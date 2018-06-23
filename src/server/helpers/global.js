@@ -28,11 +28,10 @@ module.exports = {
 				userIds.add(activity.target_id)
 			}
 		}
-		const allIds = Array.from(userIds)
-		const activityUsers = await User.all(allIds, true)
-		for (let index = allIds.length - 1; index >= 0; index -= 1) {
-			const id = allIds[index]
-			users[id] = activityUsers[index]
+		const activityUsers = await User.all(Array.from(userIds), true)
+		for (const user of activityUsers) {
+			users[user.id] = user
+			delete user.id
 		}
 	},
 

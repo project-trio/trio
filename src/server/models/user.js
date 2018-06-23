@@ -3,7 +3,7 @@ const { randomRange } = require.main.require('../common/utils')
 const db = require.main.require('./helpers/db')
 
 const FIELDS = 'id, email, EXTRACT(EPOCH FROM updated_at) AS at, passcode, EXTRACT(EPOCH FROM passcode_at) AS passcode_at, passcode_attempts, email_status, email_change'
-const PUBLIC_FIELDS = 'email, EXTRACT(EPOCH FROM updated_at) AS at'
+const PUBLIC_FIELDS = 'id, email, EXTRACT(EPOCH FROM updated_at) AS at'
 
 module.exports = {
 
