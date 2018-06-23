@@ -38,7 +38,13 @@ module.exports = {
 	namespace (io, name, callback) {
 		const namespace = io.of(`/${name}`)
 		namespace.use(auth)
-		namespace.on('connection', callback)
+		namespace.on('connection', (socket) => {
+			callback(socket)
+
+			socket.on('disconnect', () => {
+				global.disconnect(socket.user)
+			})
+		})
 		return namespace
 	},
 

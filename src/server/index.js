@@ -18,9 +18,7 @@ require('./app/trio')(io)
 
 //HYDRATE
 
-const global = require.main.require('./helpers/global')
-
-global.init(io)
+require.main.require('./helpers/global').init(io)
 
 //APP
 
