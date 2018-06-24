@@ -28,10 +28,12 @@ module.exports = {
 				userIds.add(activity.target_id)
 			}
 		}
-		const activityUsers = await User.all(Array.from(userIds), true)
-		for (const user of activityUsers) {
-			users[user.id] = user
-			delete user.id
+		if (userIds.size) {
+			const activityUsers = await User.all(Array.from(userIds), true)
+			for (const user of activityUsers) {
+				users[user.id] = user
+				delete user.id
+			}
 		}
 	},
 
@@ -48,28 +50,36 @@ module.exports = {
 		trio.in('home').emit('activity', activity)
 	},
 
-	updateUser (user) {
-		const existingUser = users[user.id]
+	connectUser (socket, privateUser) {
+		const userId = privateUser.id
+		const existingUser = users[userId]
+		let user
 		if (existingUser) {
-			existingUser.at = user.at
-			if (!existingUser.online) {
+			existingUser.at = privateUser.at
+			if (existingUser.online < 1) {
 				existingUser.online = 1
 			} else {
 				existingUser.online += 1
 			}
 			user = existingUser
 		} else {
-			user.online = 1
-			users[user.id] = {
-				email: user.email,
-				at: user.at,
+			user = {
+				name: privateUser.name,
+				ccid: privateUser.ccid,
+				md5: privateUser.md5,
+				at: privateUser.at,
+				online: 1,
 			}
+			users[userId] = user
 		}
+		socket.user = user
+		socket.emit('local', { name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
 		trio.in('home').emit('user', user)
-		return user
+		return true
 	},
 
-	disconnect (user) {
+	disconnect (socket) {
+		const user = socket.user
 		user.online -= 1
 		if (user.online === 0) {
 			trio.in('home').emit('user', user)

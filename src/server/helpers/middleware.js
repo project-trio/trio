@@ -20,7 +20,9 @@ const auth = async (socket, next) => {
 			if (!user) {
 				return authError(next, 'signin user')
 			}
-			socket.user = global.updateUser(user)
+			if (!global.connectUser(socket, user)) {
+				return authError(next, 'Already in game')
+			}
 		} catch (error) {
 			console.log(error)
 			return authError(next, 'signin error')
@@ -43,7 +45,7 @@ module.exports = {
 
 			socket.on('disconnect', () => {
 				if (socket.user) {
-					global.disconnect(socket.user)
+					global.disconnect(socket)
 				}
 			})
 		})

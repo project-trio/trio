@@ -23,6 +23,10 @@ socket.on('reconnect', () => {
 	store.commit('RECONNECT', null)
 })
 
+socket.on('local', (user) => {
+	store.commit('LOCAL_USER', user)
+})
+
 socket.on('error', (error) => {
 	console.log(error)
 	storage.clear()

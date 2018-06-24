@@ -53,7 +53,7 @@ export default {
 		},
 
 		signinEmail () {
-			return this.$store.state.email
+			return this.$store.state.changeEmail
 		},
 		md5 () {
 			return this.signinEmail ? hash(this.signinEmail) : null

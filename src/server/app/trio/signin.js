@@ -26,7 +26,7 @@ async function makePasscode (user, callback) {
 
 async function makeSession (socket, user, callback) {
 	const session = await Session.create(user)
-	socket.user = global.updateUser(user)
+	global.connectUser(socket, user)
 	callback({ token: session.id })
 }
 

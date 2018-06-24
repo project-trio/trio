@@ -24,7 +24,14 @@ export default new Vuex.Store({
 	state: {
 		loading: 0,
 		reconnectAttempts: null,
-		email: storage.get('email'),
+		changeEmail: null,
+		local: {
+			name: null,
+			email: null,
+			ccid: null,
+			md5: null,
+			admin: false,
+		},
 		sessionToken: storage.get('token'),
 		registering: false,
 
@@ -61,12 +68,9 @@ export default new Vuex.Store({
 		},
 
 		SET_EMAIL (state, { email, save, registering }) {
-			state.email = email
+			state.changeEmail = email
 			if (save || registering) {
 				state.registering = registering
-			}
-			if (save) {
-				storage.set('email', email)
 			}
 		},
 
@@ -92,6 +96,15 @@ export default new Vuex.Store({
 			if (state.users) {
 				Vue.set(state.users, user.id, user)
 			}
+		},
+
+		LOCAL_USER (state, { name, email, ccid, md5, admin }) {
+			state.local.name = name
+			state.local.email = email
+			state.local.ccid = ccid
+			state.local.md5 = md5
+			state.local.admin = admin
+			console.log(state.local)
 		},
 	},
 
