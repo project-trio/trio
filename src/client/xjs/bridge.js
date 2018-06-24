@@ -28,7 +28,7 @@ socket.on('local', (user) => {
 })
 
 socket.on('error', (error) => {
-	console.log(error)
+	window.alert(error)
 	storage.clear()
 	window.location.reload(true)
 })

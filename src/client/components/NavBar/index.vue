@@ -49,6 +49,7 @@ nav
 
 .brand
 	font-weight 900
+	letter-spacing 0.7px
 
 .avatar
 	margin-left 4px
