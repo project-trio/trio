@@ -1,3 +1,5 @@
+const Game = require('./play/Game')
+
 const queuingNames = []
 
 const queueToggle = (io, socket, queuing) => {
@@ -30,6 +32,22 @@ module.exports = (io, socket) => {
 
 	socket.on('queue', (queuing) => {
 		queueToggle(io, socket, queuing)
+	})
+
+	socket.on('singleplayer', (data, callback) => {
+		const game = new Game(io)
+		const joinData = game.add(socket)
+		callback(joinData)
+	})
+
+	socket.on('join game', (gid, callback) => {
+		for (const game of Game.all) {
+			if (game.id === gid) {
+				const joinData = game.add(socket)
+				return callback(joinData)
+			}
+		}
+		callback({ error: 'Game not found' })
 	})
 
 	socket.on('disconnect', () => {
