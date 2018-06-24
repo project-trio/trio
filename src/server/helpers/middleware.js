@@ -3,36 +3,36 @@ const global = require.main.require('./helpers/global')
 const Session = require.main.require('./models/session')
 const User = require.main.require('./models/user')
 
-const authError = (next, error) => {
-	return next(new Error(error))
+const authError = (next, redirect, error) => {
+	return next(new Error(redirect ? process.env.BASE_URL : error))
 }
 
 const auth = async (socket, next) => {
 	const query = socket.handshake.query
 	const sessionToken = query.token
 	const namespace = socket.nsp.name
-	const game = namespace !== '/trio' ? namespace : null
+	const isGame = namespace !== '/trio'
+	const game = isGame ? namespace : null
 	if (sessionToken) {
-		socket.isGame = true
 		try {
 			const session = await Session.update(sessionToken)
 			if (!session) {
-				return authError(next, 'signin session')
+				return authError(next, isGame, 'signin session')
 			}
 			const user = await User.from('id', session.user_id)
 			if (!user) {
-				return authError(next, 'signin user')
+				return authError(next, isGame, 'signin user')
 			}
 			if (!global.connectUser(socket, user, game)) {
-				return authError(next, 'Already in game')
+				return authError(next, false, 'Already in game')
 			}
 		} catch (error) {
 			console.log(error)
-			return authError(next, 'signin error')
+			return authError(next, isGame, 'signin error')
 		}
 	} else {
 		if (game) {
-			return authError(next, 'signin')
+			return authError(next, isGame, 'signin')
 		}
 	}
 	next()

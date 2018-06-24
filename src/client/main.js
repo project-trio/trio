@@ -29,3 +29,13 @@ new Vue({
 	store,
 	render: h => h(App),
 }).$mount('#app')
+
+//INIT
+
+if (router.currentRoute.query.signin && document.referrer) {
+	const token = store.state.sessionToken
+	if (token) {
+		const baseUrl = document.referrer.split('/?')[0]
+		window.location.replace(`${baseUrl}?token=${token}`)
+	}
+}
