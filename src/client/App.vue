@@ -1,5 +1,6 @@
 <template>
 <div id="app">
+	<NavBar />
 	<div v-if="reconnectAttempts !== null" class="overlay">
 		<h1 class="text-center">{{ reconnectAttempts }} attempts to reconnect</h1>
 	</div>
@@ -10,8 +11,11 @@
 </template>
 
 <script>
+import NavBar from '@/client/components/NavBar'
+
 export default {
 	components: {
+		NavBar,
 	},
 
 	computed: {
@@ -32,10 +36,22 @@ body
 	-moz-osx-font-smoothing grayscale
 	color #2
 
+a
+	color #f83
+	text-decoration none
+	transition color 300ms ease-out
+	&:hover
+		color #fa6
+		&:active
+			color #fc8
+.router-link-exact-active
+	color inherit !important
+	cursor default
+
 //PAGE
 
 .container
-	width 640px
+	width 512px
 	max-width 100%
 	margin auto
 	box-sizing border-box
@@ -99,7 +115,7 @@ textarea.big
 	width 100%
 	resize vertical
 	min-height 48px
-	max-height 256px
+	max-height 160px
 	border 1px solid #e8
 	border-radius 5px
 	text-align left
