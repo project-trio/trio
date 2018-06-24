@@ -16,6 +16,7 @@ const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
 require('./app/trio')(io)
+require('./app/td')(io)
 
 //HYDRATE
 
