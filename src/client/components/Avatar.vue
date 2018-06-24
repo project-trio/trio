@@ -27,7 +27,7 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .avatar
 	background-size cover
 	background-repeat no-repeat

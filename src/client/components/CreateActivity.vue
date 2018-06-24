@@ -51,9 +51,9 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 .multiselect
 	width 50%
 	max-width 160px
-	display inline-block !important
+	display inline-block
 </style>
