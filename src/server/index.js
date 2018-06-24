@@ -1,5 +1,3 @@
-const CommonConsts = require.main.require('../common/constants')
-
 require('dotenv').config({ path: '.env.server' })
 
 //EXPRESS
@@ -30,7 +28,7 @@ app.get('*', (request, response, _next) => {
 
 //LISTEN
 
-const port = process.env.PORT || CommonConsts.PORT
+const port = process.env.PORT || 8031
 
 http.listen(port)
 
