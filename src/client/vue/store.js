@@ -31,6 +31,7 @@ export default new Vuex.Store({
 			ccid: null,
 			md5: null,
 			admin: false,
+			timeMinutely: Date.now() / 1000,
 		},
 		sessionToken: storage.get('token'),
 		registering: false,
@@ -59,6 +60,10 @@ export default new Vuex.Store({
 	},
 
 	mutations: {
+		NOW (state) {
+			state.local.timeMinutely = Date.now() / 1000
+		},
+
 		RECONNECT (state, attempts) {
 			state.reconnectAttempts = attempts
 		},

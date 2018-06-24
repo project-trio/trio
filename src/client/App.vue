@@ -18,9 +18,47 @@ export default {
 		NavBar,
 	},
 
+	countdownInterval: null,
+
 	computed: {
 		reconnectAttempts () {
 			return this.$store.state.reconnectAttempts
+		},
+	},
+
+	created () {
+		if (document.hasFocus()) {
+			this.setCountdown(false)
+		}
+		window.addEventListener('blur', this.cancelCountdown, true)
+		window.addEventListener('focus', this.setCountdown, true)
+	},
+
+	beforeDestroy() {
+		window.removeEventListener('blur', this.cancelCountdown, true)
+		window.removeEventListener('focus', this.setCountdown, true)
+	},
+
+	methods: {
+		cancelCountdown () {
+			if (this.$options.countdownInterval) {
+				window.clearInterval(this.$options.countdownInterval)
+				this.$options.countdownInterval = null
+			}
+		},
+
+		setCountdown (event) {
+			if (this.$options.countdownInterval) {
+				return
+			}
+			this.$options.countdownInterval = window.setInterval(this.passiveUpdate, 60 * 1000)
+			if (event) {
+				this.passiveUpdate()
+			}
+		},
+
+		passiveUpdate () {
+			this.$store.commit('NOW')
 		},
 	},
 }

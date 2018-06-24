@@ -1,7 +1,7 @@
 const db = require.main.require('./helpers/db')
 const global = require.main.require('./helpers/global')
 
-const PUBLIC_FIELDS = 'id, user_id, body, created_at, updated_at, target_id, target_type, reply_id, action'
+const PUBLIC_FIELDS = 'id, user_id, body, EXTRACT(EPOCH FROM created_at) AS created_at, EXTRACT(EPOCH FROM updated_at) AS updated_at, target_id, target_type, reply_id, action'
 
 module.exports = {
 

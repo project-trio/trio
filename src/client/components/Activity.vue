@@ -15,17 +15,19 @@
 			{{ action.body }}
 		</div>
 		&nbsp;
-		<div class="text-small text-faint">{{ activity.created_at }}</div>
+		<RelativeTime :at="activity.created_at" class="text-small text-faint" />
 	</div>
 </div>
 </template>
 
 <script>
 import Avatar from '@/client/components/Avatar'
+import RelativeTime from '@/client/components/RelativeTime'
 
 export default {
 	components: {
 		Avatar,
+		RelativeTime,
 	},
 
 	props: {
