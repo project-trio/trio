@@ -44,6 +44,7 @@ a
 		color #fa6
 		&:active
 			color #fc8
+
 .router-link-exact-active
 	color inherit !important
 	cursor default
@@ -71,6 +72,10 @@ a
 	color #e33
 
 //LAYOUT
+
+.flex
+	display flex
+	align-items center
 
 .inline
 	display inline-block

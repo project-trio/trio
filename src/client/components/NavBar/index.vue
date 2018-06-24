@@ -1,8 +1,8 @@
 <template>
 <nav>
-	<div class="container text-faint">
+	<div class="container flex text-faint">
 		<router-link class="brand" :to="{ name: 'Home' }">Trio</router-link>
-		<router-link class="user-box" :to="{ query: { q: `@${name}` } }">
+		<router-link class="user-box flex" :to="{ query: { q: `@${name}` } }">
 			<span class="text-small">{{ name }}</span>
 			<Avatar :size="24" :ccid="ccid" :md5="md5" class="inline" />
 		</router-link>
@@ -42,17 +42,12 @@ nav
 .container
 	padding 0 8px
 	height inherit
-	display flex
 	justify-content space-between
-	align-items center
+	& > *
+		height inherit
 
 .brand
 	font-weight 900
-
-.user-box
-	height inherit
-	display flex
-	align-items center
 
 .avatar
 	margin-left 4px

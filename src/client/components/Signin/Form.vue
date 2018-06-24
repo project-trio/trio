@@ -99,7 +99,6 @@ export default {
 .register-line
 	display flex
 	justify-content center
-	// align-items center
 	max-width 100%
 	width inherit
 	box-sizing border-box
