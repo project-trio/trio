@@ -50,11 +50,14 @@ module.exports = {
 		trio.in('home').emit('activity', activity)
 	},
 
-	connectUser (socket, privateUser) {
+	connectUser (socket, privateUser, game) {
 		const userId = privateUser.id
 		const existingUser = users[userId]
 		let user
 		if (existingUser) {
+			if (game && existingUser.game) {
+				return false
+			}
 			existingUser.at = privateUser.at
 			if (existingUser.online < 1) {
 				existingUser.online = 1
@@ -73,6 +76,9 @@ module.exports = {
 			users[userId] = user
 		}
 		socket.user = user
+		if (game) {
+			user.game = game
+		}
 		socket.emit('local', { name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
 		trio.in('home').emit('user', user)
 		return true

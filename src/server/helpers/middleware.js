@@ -10,7 +10,10 @@ const authError = (next, error) => {
 const auth = async (socket, next) => {
 	const query = socket.handshake.query
 	const sessionToken = query.token
+	const namespace = socket.nsp.name
+	const game = namespace !== '/trio' ? namespace : null
 	if (sessionToken) {
+		socket.isGame = true
 		try {
 			const session = await Session.update(sessionToken)
 			if (!session) {
@@ -20,7 +23,7 @@ const auth = async (socket, next) => {
 			if (!user) {
 				return authError(next, 'signin user')
 			}
-			if (!global.connectUser(socket, user)) {
+			if (!global.connectUser(socket, user, game)) {
 				return authError(next, 'Already in game')
 			}
 		} catch (error) {
@@ -28,7 +31,7 @@ const auth = async (socket, next) => {
 			return authError(next, 'signin error')
 		}
 	} else {
-		if (query.requireAuth) {
+		if (game) {
 			return authError(next, 'signin')
 		}
 	}
@@ -44,7 +47,11 @@ module.exports = {
 			callback(socket)
 
 			socket.on('disconnect', () => {
-				if (socket.user) {
+				const user = socket.user
+				if (user) {
+					if (user.game === socket.nsp.name) {
+						user.game = null
+					}
 					global.disconnect(socket)
 				}
 			})
