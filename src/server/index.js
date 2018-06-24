@@ -1,4 +1,7 @@
-require('dotenv').config({ path: '.env.server' })
+const dotenv = require('dotenv')
+
+dotenv.config({ path: '.env.server' })
+dotenv.config({ path: `.env.server.${process.env.NODE_ENV}` })
 
 //EXPRESS
 

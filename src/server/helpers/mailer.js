@@ -1,5 +1,3 @@
-const CommonConsts = require.main.require('../common/constants')
-
 const sendgridMail = require('@sendgrid/mail')
 
 sendgridMail.setApiKey(process.env.SENDGRID_API_KEY)
@@ -10,7 +8,7 @@ const sendSendgrid = (message, multi, templateId, onSuccess, onError) => {
 		message.substitutions = {}
 	}
 	message.from = 'triocommunity@gmail.com'
-	message.substitutions.base_url = CommonConsts.BASE_URL
+	message.substitutions.base_url = process.env.BASE_URL
 	message.templateId = templateId
 	sendgridMail.send(message, multi)
 	.then(onSuccess)
