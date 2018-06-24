@@ -43,8 +43,9 @@ nav
 	padding 0 8px
 	height inherit
 	justify-content space-between
-	& > *
-		height inherit
+
+.user-box
+	height inherit
 
 .brand
 	font-weight 900

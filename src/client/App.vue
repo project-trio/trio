@@ -89,6 +89,10 @@ a
 .text-faint
 	color #9
 
+ul
+	padding 0
+	list-style none
+
 //CONTROLS
 
 fieldset
