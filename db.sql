@@ -83,7 +83,8 @@ CREATE TABLE public.users (
 	email_change text,
 	name public.citext NOT NULL,
 	ccid integer,
-	md5 text
+	md5 text,
+	admin boolean
 );
 
 CREATE SEQUENCE public.users_id_seq

@@ -71,6 +71,7 @@ module.exports = {
 				ccid: privateUser.ccid,
 				md5: privateUser.md5,
 				at: privateUser.at,
+				admin: privateUser.admin,
 				online: 1,
 			}
 			users[userId] = user
