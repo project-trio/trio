@@ -114,5 +114,8 @@ export default new Vuex.Store({
 	},
 
 	getters: {
+		signedIn (state) {
+			return state.local.name !== null
+		},
 	},
 })

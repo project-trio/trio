@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-	<NavBar />
+	<NavBar v-if="hasSignin" />
 	<div v-if="reconnectAttempts !== null" class="overlay">
 		<h1 class="text-center">{{ reconnectAttempts }} attempts to reconnect</h1>
 	</div>
@@ -21,6 +21,10 @@ export default {
 	countdownInterval: null,
 
 	computed: {
+		hasSignin () {
+			return this.$store.state.sessionToken
+		},
+
 		reconnectAttempts () {
 			return this.$store.state.reconnectAttempts
 		},
