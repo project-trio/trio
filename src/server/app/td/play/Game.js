@@ -1,3 +1,5 @@
+const { TESTING } = require.main.require('../common/constants')
+
 const { uid } = require.main.require('./helpers/util')
 
 const { TICK_DURATION, UPDATE_DURATION } = require('./config')
@@ -9,14 +11,15 @@ const games = []
 class Game {
 
 	constructor (io) {
-		this.io = io.to(this.id)
 		this.players = []
 		this.id = uid()
+		this.io = io.to(this.id)
 		this.game = null
 		this.started = false
 		this.finished = false
 		this.serverUpdate = 0
 		this.idleCount = 0
+		this.updatesUntilStart = (TESTING ? 5 : 15) * 1000 / UPDATE_DURATION
 
 		console.log('Created td', this.id)
 		games.push(this)
@@ -60,21 +63,54 @@ class Game {
 		return broadcastPlayers
 	}
 
-	add (socket) {
+	ready (socket) {
+		if (this.started) {
+			return
+		}
+		socket.ready = true
+		for (const socket of this.players) {
+			if (!socket.ready) {
+				return
+			}
+		}
+		this.started = true
+		this.broadcast('start game', {
+			gid: this.id,
+			players: this.formattedPlayers(),
+			tickDuration: TICK_DURATION,
+			updateDuration: UPDATE_DURATION,
+			updatesUntilStart: this.updatesUntilStart,
+		})
+		console.log('Started game', this.id)
+	}
+
+	add (socket, callback) {
 		const pid = socket.user.id
+		let data
 		if (this.playerById(pid)) {
 			socket.isActive = true
 			this.broadcast('update player', { pid: pid, joined: true })
+			data = {
+				gid: this.id,
+				players: this.formattedPlayers(),
+				tickDuration: TICK_DURATION,
+				updateDuration: UPDATE_DURATION,
+				updatesUntilStart: this.updatesUntilStart,
+				// history: this.history, //TODO
+			}
 		} else {
 			if (this.started) {
-				return { error: `Already started ${this.id}` }
+				return callback({ error: `Already started ${this.id}` })
 			}
-			this.broadcast('players', { players: this.formattedPlayers() })
+			socket.ready = false
 			socket.isActive = true
-			socket.join(this.id)
 			socket.game = this
+			this.players.push(socket)
+			data = { gid: this.id }
 		}
-		return { gid: this.id, players: this.formattedPlayers() }
+		socket.join(this.id, () => {
+			callback(data)
+		})
 	}
 
 	destroy () {
@@ -84,7 +120,6 @@ class Game {
 			socket.leave(this.id)
 			socket.game = null
 		}
-		this.players = {}
 
 		for (let idx = games.length - 1; idx >= 0; idx -= 1) {
 			if (this === games[idx]) {
@@ -118,19 +153,6 @@ class Game {
 			}
 			this.broadcast('update player', { pid: removeId, joined: false })
 		}
-	}
-
-//METHODS
-
-	start () {
-		this.broadcast('start game', {
-			gid: this.id,
-			players: this.formattedPlayers(),
-			tickDuration: TICK_DURATION,
-			updateDuration: UPDATE_DURATION,
-		})
-		this.started = true
-		console.log('Started game', this.id)
 	}
 
 	broadcast (name, message) {
