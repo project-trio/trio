@@ -2,7 +2,7 @@ const { TESTING } = require.main.require('../common/constants')
 
 const { UPDATE_DURATION } = require('./config')
 
-const Game = require('./game')
+const Game = require('./Game')
 
 const startTime = process.hrtime()
 
