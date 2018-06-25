@@ -38,7 +38,7 @@ module.exports = (socket) => {
 		if (!email) {
 			return callback({ error: 'Please enter your email' })
 		}
-		const user = await User.from('email', email)
+		const user = await User.from('email', email, true)
 		if (!data.passcode) {
 			if (user) {
 				emailSignin(socket, user, email, callback)
@@ -54,7 +54,7 @@ module.exports = (socket) => {
 		if (!name) {
 			return
 		}
-		const existingUser = await User.from('name', name)
+		const existingUser = await User.from('name', name, false)
 		if (existingUser) {
 			return callback({ error: 'User already exists', name })
 		}

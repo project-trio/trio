@@ -19,7 +19,7 @@ const auth = async (socket, next) => {
 			if (!session) {
 				return authError(next, isGame, 'signin session')
 			}
-			const user = await User.from('id', session.user_id)
+			const user = await User.from('id', session.user_id, false)
 			if (!user) {
 				return authError(next, isGame, 'signin user')
 			}

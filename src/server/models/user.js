@@ -9,11 +9,11 @@ module.exports = {
 
 	create (email, name, ccid, md5) {
 		const data = { email, name, ccid, md5 }
-		return db.one('INSERT INTO users($[this:name]) VALUES($[this:csv]) RETURNING id', data)
+		return db.one(`INSERT INTO users($[this:name]) VALUES($[this:csv]) RETURNING ${PUBLIC_FIELDS}`, data)
 	},
 
-	from (paramType, paramValue, publicFields) {
-		return db.oneOrNone(`UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE ${paramType} = $1 RETURNING ${publicFields ? PUBLIC_FIELDS : FIELDS}`, paramValue)
+	from (paramType, paramValue, privateFields) {
+		return db.oneOrNone(`UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE ${paramType} = $1 RETURNING ${privateFields ? FIELDS : PUBLIC_FIELDS}`, paramValue)
 	},
 
 	makePasscode (user) {
