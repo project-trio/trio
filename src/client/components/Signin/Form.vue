@@ -89,7 +89,9 @@ export default {
 			if (error) {
 				return window.alert(error)
 			}
-			this.$store.dispatch('SIGNIN', { email: this.email, name: this.name, ccid: this.ccid, md5: this.enableCC ? null : this.md5, passcode: this.passcode })
+			const ccid = this.enableCC ? this.ccid : null
+			const md5 = !this.enableCC ? this.md5 : null
+			this.$store.dispatch('SIGNIN', { email: this.email, name: this.name, ccid, md5, passcode: this.passcode })
 		},
 	},
 }
