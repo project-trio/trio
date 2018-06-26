@@ -14,6 +14,6 @@ module.exports = {
 	},
 
 	pages: {
-		index: { entry: 'src/client/main.js' },
+		index: { entry: 'src/client/app/main.js' },
 	},
 }
