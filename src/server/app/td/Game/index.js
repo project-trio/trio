@@ -19,7 +19,7 @@ class Game {
 		this.finished = false
 		this.serverUpdate = 0
 		this.idleCount = 0
-		this.updatesUntilStart = (TESTING ? 5 : 15) * 1000 / UPDATE_DURATION
+		this.updatesUntilStart = (TESTING ? 1 : 15) * 1000 / UPDATE_DURATION
 
 		console.log('Created td', this.id)
 		games.push(this)
@@ -123,6 +123,7 @@ class Game {
 				socket,
 				isActive: true,
 				ready: false,
+				serverUpdate: null,
 			}
 			this.players.push(player)
 			data = { gid: this.id }

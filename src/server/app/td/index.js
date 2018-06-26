@@ -1,11 +1,13 @@
 const middleware = require.main.require('./helpers/middleware')
 
-const lobby = require('./lobby')
+const lobbyEvents = require('./events/lobby')
+const playEvents = require('./events/play')
 
-require('./play/loop')
+require('./Game/loop')()
 
 module.exports = (io) => {
 	return middleware.namespace(io, 'td', (td, socket) => {
-		lobby(td, socket)
+		lobbyEvents(td, socket)
+		playEvents(td, socket)
 	})
 }

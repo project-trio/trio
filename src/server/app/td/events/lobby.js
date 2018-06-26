@@ -1,4 +1,4 @@
-const Game = require('./play/Game')
+const Game = require('../Game')
 
 const queuingNames = []
 

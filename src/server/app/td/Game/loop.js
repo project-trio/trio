@@ -2,7 +2,7 @@ const { TESTING } = require.main.require('../common/constants')
 
 const { UPDATE_DURATION } = require('./config')
 
-const Game = require('./Game')
+const Game = require('./index.js')
 
 const startTime = process.hrtime()
 
@@ -33,7 +33,7 @@ const loop = function () {
 			} else {
 				game.idleCount += 1
 			}
-			game.broadcast('update', { update: currentUpdate, actions: actionData })
+			game.broadcast('server update', { update: currentUpdate, actions: actionData })
 			game.serverUpdate = currentUpdate + 1
 		}
 	}
@@ -44,4 +44,4 @@ const loop = function () {
 	setTimeout(loop, UPDATE_DURATION * loopCount - msSinceStart)
 }
 
-loop()
+module.exports = loop

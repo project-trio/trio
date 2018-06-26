@@ -9,11 +9,12 @@ const express = require('express')
 const path = require('path')
 
 const app = express()
-const http = require('http').createServer(app)
+
+const server = require('http').createServer(app)
 
 //SOCKET.IO
 
-const io = require('socket.io')(http)
+const io = require('socket.io')(server)
 
 require('./app/trio')(io)
 require('./app/td')(io)
@@ -33,7 +34,6 @@ app.get('*', (request, response, _next) => {
 //LISTEN
 
 const port = process.env.PORT || 8031
-
-http.listen(port)
-
-console.log(`Trio running on port ${port}`, '\n')
+server.listen(port, () => {
+	console.log(`Trio running on port ${port}`, '\n')
+})
