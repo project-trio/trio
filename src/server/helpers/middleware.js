@@ -49,8 +49,11 @@ module.exports = {
 			socket.on('disconnect', () => {
 				const user = socket.user
 				if (user) {
-					if (user.game === socket.nsp.name) {
-						user.game = null
+					if (socket.game) {
+						socket.game.remove(socket)
+					}
+					if (user.gameName === socket.nsp.name) {
+						user.gameName = null
 					}
 					global.disconnect(socket)
 				}

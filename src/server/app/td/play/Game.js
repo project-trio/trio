@@ -28,12 +28,24 @@ class Game {
 //PRIVATE
 
 	playerById (id) {
-		for (const socket of this.players) {
-			if (socket.user.id === id) {
-				return socket
+		for (const player of this.players) {
+			if (player.id === id) {
+				return player
 			}
 		}
 		return null
+	}
+
+	playerIndexOf (id) {
+		let result = null
+		const players = this.players
+		for (let idx = 0; idx < players.length; idx += 1) {
+			if (players[idx].id === id) {
+				result = idx
+				break
+			}
+		}
+		return result
 	}
 
 	playerCount () {
@@ -54,22 +66,22 @@ class Game {
 
 	formattedPlayers () {
 		const broadcastPlayers = []
-		for (const socket of this.players) {
+		for (const player of this.players) {
 			broadcastPlayers.push({
-				id: socket.user.id,
-				name: socket.user.name,
+				id: player.id,
+				name: player.name,
 			})
 		}
 		return broadcastPlayers
 	}
 
 	ready (socket) {
-		if (this.started) {
+		if (this.started || !socket.player) {
 			return
 		}
-		socket.ready = true
-		for (const socket of this.players) {
-			if (!socket.ready) {
+		socket.player.ready = true
+		for (const player of this.players) {
+			if (!player.ready) {
 				return
 			}
 		}
@@ -85,11 +97,14 @@ class Game {
 	}
 
 	add (socket, callback) {
-		const pid = socket.user.id
+		const user = socket.user
+		const pid = user.id
 		let data
-		if (this.playerById(pid)) {
-			socket.isActive = true
-			this.broadcast('update player', { pid: pid, joined: true })
+		let player = this.playerById(pid)
+		if (player) {
+			player.isActive = true
+			socket.player = player
+			this.broadcast('update player', { pid, joined: true })
 			data = {
 				gid: this.id,
 				players: this.formattedPlayers(),
@@ -102,12 +117,18 @@ class Game {
 			if (this.started) {
 				return callback({ error: `Already started ${this.id}` })
 			}
-			socket.ready = false
-			socket.isActive = true
-			socket.game = this
-			this.players.push(socket)
+			player = {
+				id: user.id,
+				name: user.name,
+				socket,
+				isActive: true,
+				ready: false,
+			}
+			this.players.push(player)
 			data = { gid: this.id }
 		}
+		socket.game = this
+		socket.player = player
 		socket.join(this.id, () => {
 			callback(data)
 		})
@@ -115,10 +136,16 @@ class Game {
 
 	destroy () {
 		this.finished = true
-		for (const socket of this.players) {
-			socket.isActive = false
-			socket.leave(this.id)
-			socket.game = null
+		for (const player of this.players) {
+			player.isActive = false
+			const socket = player.socket
+			if (socket) {
+				socket.leave(this.id)
+				if (socket.game === this) {
+					socket.game = null
+					socket.player = null
+				}
+			}
 		}
 
 		for (let idx = games.length - 1; idx >= 0; idx -= 1) {
@@ -130,28 +157,24 @@ class Game {
 		console.log('ERR unable to remove deleted game', this.id)
 	}
 
-	remove (removePlayer) {
-		const removeId = removePlayer.id
-		const players = this.players
-		let removeIndex = null
-		for (let idx = 0; idx < players.length; idx += 1) {
-			if (players[idx].id === removeId) {
-				removeIndex = idx
-				break
-			}
-		}
-		if (removeIndex !== null) {
+	remove (socket) {
+		const pid = socket.user.id
+		const leaveIndex = this.playerIndexOf(pid)
+		if (leaveIndex !== null) {
 			if (this.started) {
-				removePlayer.isActive = false
+				const player = this.players[leaveIndex]
+				player.isActive = false
 			} else {
-				this.players.splice(removeIndex, 1)
+				this.players.splice(leaveIndex, 1)
 			}
 
 			if (this.activePlayerCount() <= 0) {
 				this.destroy()
 				return true
 			}
-			this.broadcast('update player', { pid: removeId, joined: false })
+			socket.game = null
+			socket.player = null
+			this.broadcast('update player', { pid, joined: false })
 		}
 	}
 
