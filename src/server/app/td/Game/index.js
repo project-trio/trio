@@ -4,6 +4,8 @@ const { uid } = require.main.require('./helpers/util')
 
 const { TICK_DURATION, UPDATE_DURATION } = require('./config')
 
+const Player = require('./Player')
+
 //CONSTRUCTOR
 
 const games = []
@@ -31,7 +33,7 @@ class Game {
 
 	playerById (id) {
 		for (const player of this.players) {
-			if (player.id === id) {
+			if (player.user.id === id) {
 				return player
 			}
 		}
@@ -70,8 +72,8 @@ class Game {
 		const broadcastPlayers = []
 		for (const player of this.players) {
 			broadcastPlayers.push({
-				id: player.id,
-				name: player.name,
+				id: player.user.id,
+				name: player.user.name,
 			})
 		}
 		return broadcastPlayers
@@ -120,16 +122,7 @@ class Game {
 			if (this.started) {
 				return callback({ error: `Already started ${this.id}` })
 			}
-			player = {
-				id: user.id,
-				name: user.name,
-				socket,
-				isActive: true,
-				ready: false,
-				serverUpdate: null,
-				wave: 0,
-				waveComplete: 0,
-			}
+			player = new Player(socket, user)
 			this.players.push(player)
 			data = { gid: this.id }
 		}
