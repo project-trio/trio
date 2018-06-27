@@ -1,12 +1,8 @@
-const { TESTING } = require.main.require('../common/constants')
-
 const { UPDATE_DURATION } = require('./config')
 
 const Game = require('./index.js')
 
 const startTime = process.hrtime()
-
-const MAX_IDLE_UPDATES = TESTING ? 1000 : 1000
 
 //LOCAL
 
@@ -15,25 +11,30 @@ let loopCount = 0
 const loop = function () {
 	for (const game of Game.all) {
 		if (game.started) {
-			let actionFound = false
-			const actionData = []
 			const currentUpdate = game.serverUpdate
-			// const onSelectionScreen = currentUpdate <= game.updatesUntilStart
-			// const gamePlayers = game.players
-			// for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
-			// 	const player = gamePlayers[pidx]
-			// }
-			if (actionFound) {
-				game.idleCount = 0
-			} else if (game.idleCount > MAX_IDLE_UPDATES) {
-				console.log(game.id, 'Game timed out due to inactivity')
-				game.broadcast('closed')
-				game.destroy()
-				continue
-			} else {
-				game.idleCount += 1
+			const gamePlayers = game.players
+			let bestWaveTime = null
+			for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
+				const player = gamePlayers[pidx]
+				if (player.wave === game.wave) {
+					if (!bestWaveTime || player.waveComplete < bestWaveTime) {
+						bestWaveTime = player.waveComplete
+					}
+				}
 			}
-			game.broadcast('server update', { update: currentUpdate, actions: actionData })
+			const winners = []
+			if (bestWaveTime) {
+				for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
+					const player = gamePlayers[pidx]
+					if (player.wave === game.wave && player.waveComplete === bestWaveTime) {
+						winners.push(pidx)
+					}
+				}
+				// console.log('Wave', game.wave, winners, currentUpdate - game.waveUpdate)
+				game.wave += 1
+				game.waveUpdate = currentUpdate
+			}
+			game.broadcast('server update', { update: currentUpdate, actions: winners })
 			game.serverUpdate = currentUpdate + 1
 		}
 	}

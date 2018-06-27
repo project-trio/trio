@@ -14,12 +14,14 @@ class Game {
 		this.players = []
 		this.id = uid()
 		this.io = io.to(this.id)
-		this.game = null
 		this.started = false
 		this.finished = false
 		this.serverUpdate = 0
 		this.idleCount = 0
 		this.updatesUntilStart = (TESTING ? 1 : 15) * 1000 / UPDATE_DURATION
+
+		this.wave = 0
+		this.waveUpdate = 0
 
 		console.log('Created td', this.id)
 		games.push(this)
@@ -86,6 +88,7 @@ class Game {
 			}
 		}
 		this.started = true
+		this.wave = 1
 		this.broadcast('start game', {
 			gid: this.id,
 			players: this.formattedPlayers(),
@@ -124,6 +127,8 @@ class Game {
 				isActive: true,
 				ready: false,
 				serverUpdate: null,
+				wave: 0,
+				waveComplete: 0,
 			}
 			this.players.push(player)
 			data = { gid: this.id }
