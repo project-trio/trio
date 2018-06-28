@@ -32,7 +32,6 @@ module.exports = {
 			const activityUsers = await User.all(Array.from(userIds), true)
 			for (const user of activityUsers) {
 				users[user.id] = user
-				delete user.id
 			}
 		}
 	},
@@ -67,6 +66,7 @@ module.exports = {
 			user = existingUser
 		} else {
 			user = {
+				id: userId,
 				name: privateUser.name,
 				ccid: privateUser.ccid,
 				md5: privateUser.md5,

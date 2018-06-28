@@ -22,10 +22,11 @@ class Game {
 		this.idleCount = 0
 		this.updatesUntilStart = (TESTING ? 1 : 15) * 1000 / UPDATE_DURATION
 
+		this.waves = 50
 		this.wave = 0
 		this.waveUpdate = 0
 
-		console.log('Created td', this.id)
+		console.log(new Date().toLocaleTimeString(), 'Created td', this.id)
 		games.push(this)
 	}
 
@@ -97,11 +98,12 @@ class Game {
 			tickDuration: TICK_DURATION,
 			updateDuration: UPDATE_DURATION,
 			updatesUntilStart: this.updatesUntilStart,
+			waves: this.waves,
 		})
-		console.log('Started game', this.id)
+		console.log(new Date().toLocaleTimeString(), 'Started game', this.id)
 	}
 
-	add (socket, callback) {
+	add (socket) {
 		const user = socket.user
 		const pid = user.id
 		let data
@@ -118,9 +120,10 @@ class Game {
 				updatesUntilStart: this.updatesUntilStart,
 				// history: this.history, //TODO
 			}
+			console.log('Rejoin game', this.id, user.id)
 		} else {
 			if (this.started) {
-				return callback({ error: `Already started ${this.id}` })
+				return socket.emit('joined game', { error: `Already started ${this.id}` })
 			}
 			player = new Player(socket, user)
 			this.players.push(player)
@@ -129,7 +132,7 @@ class Game {
 		socket.game = this
 		socket.player = player
 		socket.join(this.id, () => {
-			callback(data)
+			socket.emit('joined game', data)
 		})
 	}
 

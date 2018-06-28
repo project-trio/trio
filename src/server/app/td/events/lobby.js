@@ -1,24 +1,68 @@
+const { TESTING } = require.main.require('../common/constants')
+
 const Game = require('../Game')
 
-const queuingNames = []
+const QUEUE_WAIT = TESTING ? 6 : 20
+
+const queuingSockets = []
+
+let ioTD = null
+let queueReadyTimer = null
+
+const readySockets = () => {
+	const result = []
+	for (const socket of queuingSockets) {
+		if (socket.queueReady) {
+			result.push(socket)
+		}
+	}
+	return result
+}
+
+const popQueue = () => {
+	queueReadyTimer = null
+	const sockets = readySockets()
+	if (sockets.length < 2) {
+		return console.log('Queue not ready when popped')
+	}
+	const game = new Game(ioTD)
+	for (const socket of sockets) {
+		game.add(socket)
+	}
+}
 
 const queueToggle = (io, socket, queuing) => {
-	if (socket.queued !== queuing) {
-		socket.queued = queuing
-		const name = socket.user.name
-		if (queuing) {
-			socket.join('queue')
-			queuingNames.push(name)
+	if (queueReadyTimer) {
+		clearTimeout(queueReadyTimer)
+		queueReadyTimer = null
+	}
+	socket.queued = queuing
+	const name = socket.user.name
+	if (queuing) {
+		socket.join('queue')
+		if (!queuingSockets.includes(socket)) {
+			queuingSockets.push(socket)
 		} else {
-			socket.leave('queue')
-			queuingNames.splice(queuingNames.indexOf(name), 1)
+			console.log('Socket already in queue', name)
 		}
-		io.in('lobby').emit(`queue ${queuing ? 'join' : 'leave'}`, name)
-		console.log(new Date().toLocaleTimeString(), `queue ${queuing ? 'join' : 'leave'}`, name)
+	} else {
+		socket.leave('queue')
+		const index = queuingSockets.indexOf(socket)
+		if (index !== -1) {
+			queuingSockets.splice(index, 1)
+		} else {
+			console.log('Socket not in queue to leave', name)
+		}
+	}
+	io.in('lobby').emit(`queue ${queuing ? 'join' : 'leave'}`, name)
+
+	if (queuingSockets.length >= 2) {
+		queueReadyTimer = setTimeout(popQueue, QUEUE_WAIT * 1000)
 	}
 }
 
 module.exports = (io, socket) => {
+	ioTD = io
 	socket.queued = false
 
 	socket.on('lobby', (lobbying, callback) => {
@@ -27,25 +71,30 @@ module.exports = (io, socket) => {
 		} else {
 			socket.leave('lobby')
 		}
-		callback && callback(queuingNames)
+		callback && callback(queuingSockets.map(s => s.name))
 	})
 
-	socket.on('queue', (queuing) => {
+	socket.on('queue', (queuing, callback) => {
+		socket.queueReady = false
 		queueToggle(io, socket, queuing)
+		callback(QUEUE_WAIT)
+	})
+	socket.on('queue ready', (queuing) => {
+		socket.queueReady = queuing
 	})
 
-	socket.on('singleplayer', (data, callback) => {
+	socket.on('singleplayer', () => {
 		const game = new Game(io)
-		game.add(socket, callback)
+		game.add(socket)
 	})
 
-	socket.on('join game', (gid, callback) => {
+	socket.on('join game', (gid) => {
 		for (const game of Game.all) {
 			if (game.id === gid) {
-				game.add(socket, callback)
+				return game.add(socket)
 			}
 		}
-		callback({ error: 'Game not found' })
+		socket.emit('joined game', { error: 'Game not found' })
 	})
 
 	socket.on('ready', () => {
