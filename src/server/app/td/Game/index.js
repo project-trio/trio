@@ -42,15 +42,14 @@ class Game {
 	}
 
 	playerIndexOf (id) {
-		let result = null
 		const players = this.players
 		for (let idx = 0; idx < players.length; idx += 1) {
-			if (players[idx].id === id) {
-				result = idx
-				break
+			const player = players[idx]
+			if (player.user.id === id) {
+				return idx
 			}
 		}
-		return result
+		return null
 	}
 
 	playerCount () {

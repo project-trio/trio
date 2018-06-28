@@ -50,8 +50,6 @@ const queueToggle = (io, socket, queuing) => {
 		const index = queuingSockets.indexOf(socket)
 		if (index !== -1) {
 			queuingSockets.splice(index, 1)
-		} else {
-			console.log('Socket not in queue to leave', name)
 		}
 	}
 	io.in('lobby').emit(`queue ${queuing ? 'join' : 'leave'}`, name)
