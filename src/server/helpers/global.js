@@ -80,7 +80,7 @@ module.exports = {
 		if (game) {
 			user.gameName = game
 		}
-		socket.emit('local', { name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
+		socket.emit('local', { id: user.id, name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
 		trio.in('home').emit('user', user)
 		return true
 	},

@@ -1,7 +1,23 @@
 module.exports = (io, socket) => {
 	socket.on('updated', (data) => {
-		if (socket.player) {
-			socket.player.serverUpdate = data.update
+		const player = socket.player
+		if (player) {
+			player.serverUpdate = data.update
+		}
+	})
+
+	socket.on('player update', (data) => {
+		const player = socket.player
+		if (player) {
+			if (data.lives !== undefined) {
+				player.send.lives = data.lives
+			}
+			player.send.creeps = data.creeps
+			if (data.towers) {
+				for (const tower of data.towers) {
+					player.towers.push(tower)
+				}
+			}
 		}
 	})
 

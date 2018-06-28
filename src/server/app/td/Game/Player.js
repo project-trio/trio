@@ -10,6 +10,9 @@ module.exports = class Player {
 
 		this.wave = 0
 		this.waveComplete = 0
+
+		this.send = {}
+		this.towers = []
 	}
 
 }
