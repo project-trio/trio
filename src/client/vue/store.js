@@ -99,17 +99,16 @@ export default new Vuex.Store({
 		},
 		USER (state, user) {
 			if (state.users) {
-				Vue.set(state.users, user.id, user)
+				state.users[user.id] = user
 			}
 		},
 
 		LOCAL_USER (state, { name, email, ccid, md5, admin }) {
 			state.local.name = name
-			state.local.email = email
+			state.local.email = email //TODO return email
 			state.local.ccid = ccid
 			state.local.md5 = md5
 			state.local.admin = admin
-			console.log(state.local)
 		},
 	},
 

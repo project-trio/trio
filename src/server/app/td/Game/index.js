@@ -20,7 +20,7 @@ class Game {
 		this.finished = false
 		this.serverUpdate = 0
 		this.idleCount = 0
-		this.updatesUntilStart = (TESTING ? 1 : 15) * 1000 / UPDATE_DURATION
+		this.updatesUntilStart = (TESTING ? 2 : 15) * 1000 / UPDATE_DURATION
 
 		this.waves = 50
 		this.wave = 0
