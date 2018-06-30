@@ -1,6 +1,6 @@
 # Trio
 
-[http://trio.suzu.online]()
+https://trio.suzu.online
 
 Multiplayer game server and realtime frontend with community features.
 
