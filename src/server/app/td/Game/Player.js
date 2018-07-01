@@ -6,10 +6,11 @@ module.exports = class Player {
 
 		this.joined = true
 		this.ready = false
+		this.lost = false
 		this.finished = false
 		this.serverUpdate = null
 
-		this.wave = 0
+		this.waveNumber = 0
 		this.waveComplete = 0
 		this.lives = 20
 
@@ -21,8 +22,10 @@ module.exports = class Player {
 		this.send.lives = lives
 		this.lives = lives
 		if (lives <= 0) {
-			this.finished = true
+			this.lost = true
+			return false
 		}
+		return true
 	}
 
 }

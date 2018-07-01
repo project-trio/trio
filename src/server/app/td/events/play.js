@@ -7,10 +7,16 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('player update', (data) => {
+		const game = socket.game
 		const player = socket.player
+		if (!game || !player) {
+			return console.log('No game for socket', socket.user, game, player)
+		}
 		if (player) {
 			if (data.lives !== undefined) {
-				player.setLives(data.lives)
+				if (!player.setLives(data.lives)) {
+					game.checkFinished()
+				}
 			}
 			player.send.creeps = data.creeps
 			if (data.towers) {
@@ -31,17 +37,18 @@ module.exports = (io, socket) => {
 
 	socket.on('wave complete', (data) => {
 		const game = socket.game
-		if (!game) {
+		const player = socket.player
+		if (!game || !player) {
 			return console.log('No game for socket', socket.user)
 		}
-		if (game.wave !== data.wave) {
-			return console.log('Wave mismatch', socket.game.wave, data)
+		if (game.waveCheck !== data.wave) {
+			return console.log('Wave mismatch', game.waveNumber, data)
 		}
-		const player = socket.player
-		player.wave = data.wave
+		player.waveNumber = data.wave
 		player.waveComplete = data.time
-		if (player.wave >= game.waves) {
+		if (player.waveNumber >= game.waves) {
 			player.finished = true
+			game.checkFinished()
 		}
 	})
 

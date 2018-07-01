@@ -22,15 +22,18 @@ class Game {
 		this.idleCount = 0
 		this.updatesUntilStart = (TESTING ? 2 : 15) * 1000 / UPDATE_DURATION
 
-		this.waves = 50
-		this.wave = 0
-		this.waveUpdate = 0
+		this.waves = 3 //SAMPLE
+		this.wavesFinished
+		this.waveNumber = 0
+		this.waveCheck = 1
+		this.sendWaveResult = true
+		this.duration = 0
 
 		this.creepMode = null
 		this.towerMode = null
 		this.sellMode = null
 
-		console.log(new Date().toLocaleTimeString(), 'Created td', this.id)
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD created')
 		games.push(this)
 	}
 
@@ -87,6 +90,7 @@ class Game {
 		if (this.playing || !socket.player) {
 			return
 		}
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD started')
 		socket.player.ready = true
 		for (const player of this.players) {
 			if (!player.ready) {
@@ -95,7 +99,7 @@ class Game {
 		}
 		this.state = 'started'
 		this.playing = true
-		this.wave = 1
+		this.waveNumber = 1
 		this.broadcast('start game', {
 			gid: this.id,
 			players: this.formattedPlayers(),
@@ -107,7 +111,6 @@ class Game {
 			towerMode: this.towerMode,
 			sellMode: this.sellMode,
 		})
-		console.log(new Date().toLocaleTimeString(), 'Started game', this.id)
 	}
 
 	add (socket) {
@@ -145,8 +148,25 @@ class Game {
 
 //LEAVE
 
-	destroy () {
+	checkFinished () {
+		for (const player of this.players) {
+			if (player.joined && !player.lost && (!this.wavesFinished || !player.finished)) {
+				return false
+			}
+		}
+		this.finish()
+	}
+
+	finish () {
+		if (this.finished) {
+			return console.log('Game already finished')
+		}
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD finished')
+		this.state = 'finished'
 		this.finished = true
+	}
+
+	destroy () {
 		for (const player of this.players) {
 			const socket = player.socket
 			if (socket) {
@@ -161,7 +181,7 @@ class Game {
 		for (let idx = games.length - 1; idx >= 0; idx -= 1) {
 			if (this === games[idx]) {
 				games.splice(idx, 1)
-				return
+				return console.log(new Date().toLocaleTimeString(), this.id, 'TD removed')
 			}
 		}
 		console.log('ERR unable to remove deleted game', this.id)

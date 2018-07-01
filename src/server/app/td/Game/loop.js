@@ -19,7 +19,7 @@ const loop = function () {
 		let bestWaveTime = null
 		for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
 			const player = gamePlayers[pidx]
-			if (player.wave === game.wave) {
+			if (player.waveNumber === game.waveCheck) {
 				if (!bestWaveTime || player.waveComplete < bestWaveTime) {
 					bestWaveTime = player.waveComplete
 				}
@@ -32,20 +32,37 @@ const loop = function () {
 			states[pidx] = player.send
 			player.send = {}
 		}
+		let wave = null
 		const winners = []
 		if (bestWaveTime) {
-			for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
-				const player = gamePlayers[pidx]
-				if (player.wave === game.wave && player.waveComplete === bestWaveTime) {
-					winners.push(pidx)
+			const sendResult = !game.sendWaveResult
+			game.sendWaveResult = sendResult
+			if (sendResult) {
+				for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
+					const player = gamePlayers[pidx]
+					if (player.waveNumber === game.waveCheck && player.waveComplete === bestWaveTime) {
+						winners.push(pidx)
+					}
 				}
+				wave = game.waveCheck
+				game.waveCheck = game.waveNumber
+				if (game.waveCheck > game.waves) {
+					game.wavesFinished = true
+					game.finish()
+				}
+			} else {
+				wave = game.waveNumber
+				game.waveNumber += 1
+				game.duration += bestWaveTime + 1000
 			}
-			// console.log('Wave', game.wave, winners, currentUpdate - game.waveUpdate)
-			game.wave += 1
-			game.waveUpdate = currentUpdate
 		}
 
-		game.broadcast('server update', { update: currentUpdate, actions: winners, states })
+		const actions = [ wave, winners.length ? winners : null ]
+		const finished = game.finished
+		if (finished) {
+			game.playing = false
+		}
+		game.broadcast('server update', { update: currentUpdate, actions, states, finished: finished ? game.duration : undefined })
 		game.serverUpdate = currentUpdate + 1
 	}
 
