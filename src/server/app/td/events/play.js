@@ -10,7 +10,7 @@ module.exports = (io, socket) => {
 		const player = socket.player
 		if (player) {
 			if (data.lives !== undefined) {
-				player.send.lives = data.lives
+				player.setLives(data.lives)
 			}
 			player.send.creeps = data.creeps
 			if (data.towers) {
@@ -30,14 +30,19 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('wave complete', (data) => {
-		if (!socket.game) {
+		const game = socket.game
+		if (!game) {
 			return console.log('No game for socket', socket.user)
 		}
-		if (socket.game.wave !== data.wave) {
+		if (game.wave !== data.wave) {
 			return console.log('Wave mismatch', socket.game.wave, data)
 		}
-		socket.player.wave = data.wave
-		socket.player.waveComplete = data.time
+		const player = socket.player
+		player.wave = data.wave
+		player.waveComplete = data.time
+		if (player.wave >= game.waves) {
+			player.finished = true
+		}
 	})
 
 }

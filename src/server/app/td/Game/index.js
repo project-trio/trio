@@ -16,8 +16,8 @@ class Game {
 		this.players = []
 		this.id = uid()
 		this.io = io.to(this.id)
-		this.started = false
-		this.finished = false
+		this.state = 'open'
+		this.playing = false
 		this.serverUpdate = 0
 		this.idleCount = 0
 		this.updatesUntilStart = (TESTING ? 2 : 15) * 1000 / UPDATE_DURATION
@@ -25,6 +25,10 @@ class Game {
 		this.waves = 50
 		this.wave = 0
 		this.waveUpdate = 0
+
+		this.creepMode = null
+		this.towerMode = null
+		this.sellMode = null
 
 		console.log(new Date().toLocaleTimeString(), 'Created td', this.id)
 		games.push(this)
@@ -59,7 +63,7 @@ class Game {
 	activePlayerCount () {
 		let result = 0
 		for (const player of this.players) {
-			if (player.isActive) {
+			if (player.joined) {
 				result += 1
 			}
 		}
@@ -80,7 +84,7 @@ class Game {
 	}
 
 	ready (socket) {
-		if (this.started || !socket.player) {
+		if (this.playing || !socket.player) {
 			return
 		}
 		socket.player.ready = true
@@ -89,7 +93,8 @@ class Game {
 				return
 			}
 		}
-		this.started = true
+		this.state = 'started'
+		this.playing = true
 		this.wave = 1
 		this.broadcast('start game', {
 			gid: this.id,
@@ -98,6 +103,9 @@ class Game {
 			updateDuration: UPDATE_DURATION,
 			updatesUntilStart: this.updatesUntilStart,
 			waves: this.waves,
+			creepMode: this.creepMode,
+			towerMode: this.towerMode,
+			sellMode: this.sellMode,
 		})
 		console.log(new Date().toLocaleTimeString(), 'Started game', this.id)
 	}
@@ -108,7 +116,7 @@ class Game {
 		let data
 		let player = this.playerById(pid)
 		if (player) {
-			player.isActive = true
+			player.joined = true
 			socket.player = player
 			this.broadcast('update player', { pid, joined: true })
 			data = {
@@ -121,8 +129,8 @@ class Game {
 			}
 			console.log('Rejoin game', this.id, user.id)
 		} else {
-			if (this.started) {
-				return socket.emit('joined game', { error: `Already started ${this.id}` })
+			if (this.playing) {
+				return socket.emit('joined game', { error: `Already playing ${this.id}` })
 			}
 			player = new Player(socket, user)
 			this.players.push(player)
@@ -135,10 +143,11 @@ class Game {
 		})
 	}
 
+//LEAVE
+
 	destroy () {
 		this.finished = true
 		for (const player of this.players) {
-			player.isActive = false
 			const socket = player.socket
 			if (socket) {
 				socket.leave(this.id)
@@ -162,9 +171,9 @@ class Game {
 		const pid = socket.user.id
 		const leaveIndex = this.playerIndexOf(pid)
 		if (leaveIndex !== null) {
-			if (this.started) {
+			if (this.playing) {
 				const player = this.players[leaveIndex]
-				player.isActive = false
+				player.joined = false
 			} else {
 				this.players.splice(leaveIndex, 1)
 			}
@@ -194,7 +203,7 @@ Game.getList = function () {
 		result.push({
 			id: game.id,
 			players: game.formattedPlayers(),
-			started: game.started,
+			state: game.state,
 			update: game.serverUpdate,
 		})
 	}
