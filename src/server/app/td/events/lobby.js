@@ -19,6 +19,14 @@ const readySockets = () => {
 	return result
 }
 
+const leaveQueue = (socket) => {
+	socket.leave('queue')
+	const index = queuingSockets.indexOf(socket)
+	if (index !== -1) {
+		queuingSockets.splice(index, 1)
+	}
+}
+
 const popQueue = () => {
 	queueReadyTimer = null
 	const sockets = readySockets()
@@ -27,6 +35,7 @@ const popQueue = () => {
 	}
 	const game = new Game(ioTD)
 	for (const socket of sockets) {
+		leaveQueue(socket)
 		game.add(socket)
 	}
 }
@@ -46,11 +55,7 @@ const queueToggle = (io, socket, queuing) => {
 			console.log('Socket already in queue', name)
 		}
 	} else {
-		socket.leave('queue')
-		const index = queuingSockets.indexOf(socket)
-		if (index !== -1) {
-			queuingSockets.splice(index, 1)
-		}
+		leaveQueue(socket)
 	}
 	io.in('lobby').emit(`queue ${queuing ? 'join' : 'leave'}`, name)
 
