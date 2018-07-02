@@ -3,12 +3,17 @@
 	<div class="flex">
 		<router-link class="flex" :to="{ name: 'User', params: { name } }">
 			<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
-			<div class="">{{ name }}</div>
+			<div>{{ name }}</div>
 		</router-link>
 		&nbsp;
 		<div v-if="action">
 			<div v-if="action === 'create'">
 				joined!
+			</div>
+			<div v-else-if="action === 'highscore'">
+				highscored
+				<router-link :to="{ name: 'Topic', params: { name: topic } }">{{ topic }}</router-link>
+				{{ highscoreDescription }}!
 			</div>
 		</div>
 		<div v-else>
@@ -41,6 +46,11 @@ export default {
 
 		topic () {
 			return this.$store.state.topics[this.activity.target_id]
+		},
+
+		highscoreDescription () {
+			const split = this.activity.body.split(' ')
+			return split.join(' mode in ')
 		},
 
 		name () {
