@@ -176,9 +176,10 @@ class Game {
 			if (player.waveNumber >= this.waves) {
 				const user = player.user
 				const score = this.duration
-				const updated = await UserModel.highscore(user, 2, 'normal', score, false)
+				const mode = 'normal'
+				const updated = await UserModel.highscore(user, 2, mode, score, false)
 				if (updated) {
-					ActivityModel.create(user, { action: 'highscore', body: displayTime(score), target_id: 2, target_type: 'topic' })
+					ActivityModel.create(user, { action: 'highscore', body: `${mode} ${displayTime(score)}`, target_id: 2, target_type: 'topic' })
 				}
 			}
 		} else {
