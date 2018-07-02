@@ -38,6 +38,7 @@ export default new Vuex.Store({
 
 		activities: null,
 		users: {},
+		topics: {},
 	},
 
 	actions: {
@@ -55,6 +56,7 @@ export default new Vuex.Store({
 			send(commit, 'join home', null, (response) => {
 				commit('ACTIVITIES', response.activities)
 				commit('USERS', response.users)
+				commit('TOPICS', response.topics)
 			})
 		},
 	},
@@ -100,6 +102,15 @@ export default new Vuex.Store({
 		USER (state, user) {
 			if (state.users) {
 				state.users[user.id] = user
+			}
+		},
+
+		TOPICS (state, topics) {
+			state.topics = topics
+		},
+		TOPIC (state, topic) {
+			if (state.topics) {
+				state.topics[topic.id] = topic
 			}
 		},
 

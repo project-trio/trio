@@ -19,9 +19,42 @@ export default {
 		CreateActivity,
 	},
 
+	props: {
+		user: String,
+		topic: String,
+	},
+
 	computed: {
+		userId () {
+			const users = this.$store.state.users
+			for (const id in users) {
+				const user = users[id]
+				if (user.name === this.user) {
+					return parseInt(id, 10)
+				}
+			}
+		},
+		topicId () {
+			const topics = this.$store.state.topics
+			for (const id in topics) {
+				if (topics[id] === this.topic) {
+					return parseInt(id, 10)
+				}
+			}
+		},
+
 		activities () {
-			return this.$store.state.activities
+			const filterUserId = this.user && this.userId
+			const filterTopicId = this.topic && this.topicId
+			const filterId = filterUserId || filterTopicId
+			const filterType = filterUserId ? 'user' : 'topic'
+			const activities = this.$store.state.activities
+			return !filterId ? activities : activities.filter(activity => {
+				if (filterUserId && activity.user_id === filterUserId) {
+					return true
+				}
+				return activity.target_id === filterId && activity.target_type === filterType
+			})
 		},
 	},
 
@@ -30,3 +63,8 @@ export default {
 	},
 }
 </script>
+
+<style lang="stylus" scoped>
+li
+	margin 48px 0
+</style>

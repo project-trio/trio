@@ -1,7 +1,7 @@
 <template>
 <div class="activity-item">
 	<div class="flex">
-		<router-link class="flex" :to="{ query: { q: `@${name}` } }">
+		<router-link class="flex" :to="{ name: 'User', params: { name } }">
 			<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
 			<div class="">{{ name }}</div>
 		</router-link>
@@ -37,6 +37,10 @@ export default {
 	computed: {
 		user () {
 			return this.$store.state.users[this.activity.user_id]
+		},
+
+		topic () {
+			return this.$store.state.topics[this.activity.target_id]
 		},
 
 		name () {
