@@ -1,8 +1,6 @@
 <template>
 <form @submit.prevent="onSubmit">
 	<fieldset :disabled="loading">
-		<Multiselect v-model="topicSelected" :options="topicsAvailable" @tag="onTagTopic" placeholder="Topic" taggable selectLabel="⏎" deselectLabel="⏎" />
-		<Multiselect v-model="userSelected" :options="usersAvailable" placeholder="User" selectLabel="⏎" deselectLabel="⏎" />
 		<textarea v-model="message" class="big" :placeholder="messagePlaceholder" />
 		<button v-if="message" type="submit" class="big">Submit</button>
 	</fieldset>
@@ -10,21 +8,11 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
 
 export default {
-	components: {
-		Multiselect,
-	},
-
 	data () {
 		return {
 			message: null,
-
-			topicsAvailable: [ 'Following' ],
-			topicSelected: null,
-			usersAvailable: [ 'Friends' ],
-			userSelected: null,
 		}
 	},
 
@@ -34,17 +22,13 @@ export default {
 		},
 
 		messagePlaceholder () {
-			const target = this.userSelected || this.topicSelected
-			return target ? `Message ${target}` : 'Update your status'
+			const prefix = this.$route.name === 'User' ? 'to' : 'in'
+			const target = this.$route.params.name
+			return target ? `Message ${prefix} ${target}` : 'Update your status'
 		},
 	},
 
 	methods: {
-		onTagTopic (tag) {
-			this.topicsAvailable.push(tag)
-			this.topicSelected = tag
-		},
-
 		onSubmit() {
 		},
 	},
