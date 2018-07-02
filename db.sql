@@ -10,11 +10,13 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 CREATE TABLE public.games (
 	id text NOT NULL,
 	topic_id integer,
-	started_at timestamp with time zone DEFAULT now() NOT NULL,
-	finished_at timestamp with time zone,
 	players integer[],
-	data text,
-	version integer NOT NULL
+	data jsonb,
+	version text NOT NULL,
+	started_at timestamp with time zone NOT NULL,
+	duration integer,
+	completed boolean,
+	mode text
 );
 
 CREATE TABLE public.topics (
@@ -64,6 +66,15 @@ CREATE TABLE public.user_follows (
 	updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
+CREATE TABLE public.user_game_scores (
+	user_id integer NOT NULL,
+	topic_id integer NOT NULL,
+	mode text NOT NULL,
+	score integer,
+	created_at timestamp with time zone DEFAULT now(),
+	updated_at timestamp with time zone DEFAULT now()
+);
+
 CREATE TABLE public.user_sessions (
 	id uuid DEFAULT public.gen_random_uuid() NOT NULL,
 	user_id integer,
@@ -84,7 +95,9 @@ CREATE TABLE public.users (
 	name public.citext NOT NULL,
 	ccid integer,
 	md5 text,
-	admin boolean
+	admin boolean,
+	game_count integer DEFAULT 0,
+	quit_count integer DEFAULT 0
 );
 
 CREATE SEQUENCE public.users_id_seq
@@ -115,6 +128,9 @@ ALTER TABLE ONLY public.user_activities
 ALTER TABLE ONLY public.user_follows
 	ADD CONSTRAINT user_follows_pkey PRIMARY KEY (user_id, target_id, target_type);
 
+ALTER TABLE ONLY public.user_game_scores
+	ADD CONSTRAINT user_game_scores_pkey PRIMARY KEY (user_id, topic_id, mode);
+
 ALTER TABLE ONLY public.user_sessions
 	ADD CONSTRAINT user_sessions_pkey PRIMARY KEY (id);
 
@@ -129,6 +145,12 @@ ALTER TABLE ONLY public.games
 
 ALTER TABLE ONLY public.user_activities
 	ADD CONSTRAINT user_activities_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_game_scores
+	ADD CONSTRAINT user_game_scores_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_game_scores
+	ADD CONSTRAINT user_game_scores_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.user_sessions
 	ADD CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
