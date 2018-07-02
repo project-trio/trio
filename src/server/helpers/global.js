@@ -1,25 +1,27 @@
 const { now } = require.main.require('../common/utils')
+
 const User = require.main.require('./models/user')
 
 let trio
 
 let activities = []
 let users = {}
+let topics = {}
 
 module.exports = {
 
-	activities () {
-		return activities
-	},
-
-	users () {
-		return users
+	initData () {
+		return { activities, users, topics }
 	},
 
 	async init (io) {
 		trio = io.of('/trio')
-		const Activity = require.main.require('./models/activity')
-		activities = await Activity.latest()
+
+		activities = await require.main.require('./models/activity').latest()
+		const topicArray = await require.main.require('./models/topic').latest()
+		for (const topic of topicArray) {
+			topics[topic.id] = topic.name
+		}
 
 		const userIds = new Set()
 		for (const activity of activities) {
