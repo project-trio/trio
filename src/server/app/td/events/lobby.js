@@ -57,7 +57,7 @@ const queueToggle = (io, socket, queuing) => {
 	} else {
 		leaveQueue(socket)
 	}
-	io.in('lobby').emit(`queue ${queuing ? 'join' : 'leave'}`, name)
+	io.in('lobby').emit('queued', [ name, queuing ])
 
 	if (queuingSockets.length >= 2) {
 		queueReadyTimer = setTimeout(popQueue, QUEUE_WAIT * 1000)
@@ -74,7 +74,7 @@ module.exports = (io, socket) => {
 		} else {
 			socket.leave('lobby')
 		}
-		callback && callback(queuingSockets.map(s => s.name))
+		callback && callback(queuingSockets.map(socket => socket.user.name))
 	})
 
 	socket.on('queue', (queuing, callback) => {
