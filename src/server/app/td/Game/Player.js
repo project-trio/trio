@@ -11,8 +11,9 @@ module.exports = class Player {
 		this.serverUpdate = null
 
 		this.waveNumber = 0
-		this.waveComplete = 0
+		this.waveAt = 0
 		this.lives = 20
+		this.wavesWon = 0
 
 		this.send = {}
 		this.towers = []
@@ -26,6 +27,10 @@ module.exports = class Player {
 			return false
 		}
 		return true
+	}
+
+	score () {
+		return -20 + this.lives + this.wavesWon * 10
 	}
 
 }

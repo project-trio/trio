@@ -15,4 +15,22 @@ module.exports = {
 		return result.join('')
 	},
 
+	displayTime (duration) {
+		let seconds = Math.round(duration / 1000)
+		let minutes
+		if (seconds >= 60) {
+			minutes = Math.floor(seconds / 60)
+			seconds %= 60
+			if (minutes < 10) {
+				minutes = `0${minutes}`
+			}
+		} else {
+			minutes = '00'
+		}
+		if (seconds < 10) {
+			seconds = `0${seconds}`
+		}
+		return `${minutes}:${seconds}`
+	},
+
 }

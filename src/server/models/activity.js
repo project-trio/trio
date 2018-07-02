@@ -7,7 +7,7 @@ module.exports = {
 
 	async create (user, data) {
 		data.user_id = user.id
-		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:csv]) RETURNING ${PUBLIC_FIELDS}`, data)
+		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING ${PUBLIC_FIELDS}`, data)
 		global.addActivity(user, activity)
 		return activity
 	},

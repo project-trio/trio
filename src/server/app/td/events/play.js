@@ -45,7 +45,7 @@ module.exports = (io, socket) => {
 			return console.log('Wave mismatch', game.waveNumber, data)
 		}
 		player.waveNumber = data.wave
-		player.waveComplete = data.time
+		player.waveAt = data.time
 		if (player.waveNumber >= game.waves) {
 			player.finished = true
 			game.checkFinished()

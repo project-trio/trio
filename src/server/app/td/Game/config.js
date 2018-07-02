@@ -4,4 +4,6 @@ module.exports = {
 
 	UPDATE_DURATION: 1000,
 
+	VERSION: '0.1',
+
 }
