@@ -12,7 +12,7 @@ const games = []
 
 class Game {
 
-	constructor (io) {
+	constructor (io, playerCount) {
 		this.players = []
 		this.id = uid()
 		this.io = io.to(this.id)
@@ -21,6 +21,7 @@ class Game {
 		this.serverUpdate = 0
 		this.idleCount = 0
 		this.updatesUntilStart = (TESTING ? 2 : 15) * 1000 / UPDATE_DURATION
+		this.singleplayer = playerCount <= 1
 
 		this.waves = 3 //SAMPLE
 		this.wavesFinished

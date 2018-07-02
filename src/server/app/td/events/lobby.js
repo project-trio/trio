@@ -33,7 +33,7 @@ const popQueue = () => {
 	if (sockets.length < 2) {
 		return console.log('Queue not ready when popped')
 	}
-	const game = new Game(ioTD)
+	const game = new Game(ioTD, sockets.length)
 	for (const socket of sockets) {
 		leaveQueue(socket)
 		game.add(socket)
@@ -87,7 +87,7 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('singleplayer', () => {
-		const game = new Game(io)
+		const game = new Game(io, 1)
 		game.add(socket)
 	})
 
