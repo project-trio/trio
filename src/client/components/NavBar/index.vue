@@ -2,7 +2,7 @@
 <nav>
 	<div class="container flex text-faint">
 		<router-link class="brand" :to="{ name: 'Home' }">Trio</router-link>
-		<router-link class="user-box flex" :to="{ name: 'User', params: { name } }">
+		<router-link v-if="name" class="user-box flex" :to="{ name: 'User', params: { name } }">
 			<span class="text-small">{{ name }}</span>
 			<Avatar :size="24" :ccid="ccid" :md5="md5" class="inline" />
 		</router-link>

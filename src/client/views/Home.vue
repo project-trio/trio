@@ -1,8 +1,8 @@
 <template>
 <div class="home">
 	<div v-if="user" class="flex">
-		<Avatar :size="48" :ccid="userFilter.ccid" :md5="userFilter.md5" />
-		<h1>{{ userFilter.name }}</h1>
+		<Avatar :size="48" :ccid="userFilter && userFilter.ccid" :md5="userFilter && userFilter.md5" />
+		<h1>{{ !userFilter ? '[ unknown ]' : userFilter.name }}</h1>
 	</div>
 	<div v-else-if="topic">
 		<h1>{{ topic }}</h1>
@@ -65,7 +65,7 @@ export default {
 		},
 
 		activities () {
-			const filterUserId = this.user && this.userId
+			const filterUserId = this.user && this.userFilter && this.userId
 			const filterTopicId = this.topic && this.topicId
 			const filterId = filterUserId || filterTopicId
 			const filterType = filterUserId ? 'user' : 'topic'
