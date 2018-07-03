@@ -16,9 +16,10 @@ const games = []
 
 class Game {
 
-	constructor (io, playerCount) {
-		this.players = []
+	constructor (io, mode, playerCount) {
 		this.id = uid()
+		this.mode = mode
+		this.players = []
 		this.io = io.to(this.id)
 		this.state = 'open'
 		this.playing = false
@@ -35,11 +36,7 @@ class Game {
 		this.duration = 0
 		this.startTime = null
 
-		this.creepMode = null
-		this.towerMode = null
-		this.sellMode = null
-
-		console.log(new Date().toLocaleTimeString(), this.id, 'TD created')
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD created', this.mode)
 		games.push(this)
 	}
 
@@ -96,7 +93,7 @@ class Game {
 		if (this.playing || !socket.player) {
 			return
 		}
-		console.log(new Date().toLocaleTimeString(), this.id, 'TD started')
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD started', this.players.length)
 		socket.player.ready = true
 		for (const player of this.players) {
 			if (!player.ready) {
@@ -114,9 +111,7 @@ class Game {
 			updateDuration: UPDATE_DURATION,
 			updatesUntilStart: this.updatesUntilStart,
 			waves: this.waves,
-			creepMode: this.creepMode,
-			towerMode: this.towerMode,
-			sellMode: this.sellMode,
+			mode: this.mode,
 		})
 	}
 
@@ -176,10 +171,9 @@ class Game {
 			if (player.waveNumber >= this.waves) {
 				const user = player.user
 				const score = this.duration
-				const mode = 'normal'
-				const updated = await UserModel.highscore(user, 2, mode, score, false)
+				const updated = await UserModel.highscore(user, 2, this.mode, score, false)
 				if (updated) {
-					ActivityModel.create(user, { action: 'highscore', body: `${mode} ${displayTime(score)}`, target_id: 2, target_type: 'topic' })
+					ActivityModel.create(user, { action: 'highscore', body: `${this.mode} ${displayTime(score)}`, target_id: 2, target_type: 'topic' })
 				}
 			}
 		} else {

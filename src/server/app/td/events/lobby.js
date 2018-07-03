@@ -12,7 +12,7 @@ let queueReadyTimer = null
 const readySockets = () => {
 	const result = []
 	for (const socket of queuingSockets) {
-		if (socket.queueReady) {
+		if (socket.queue.ready) {
 			result.push(socket)
 		}
 	}
@@ -33,7 +33,8 @@ const popQueue = () => {
 	if (sockets.length < 2) {
 		return console.log('Queue not ready when popped')
 	}
-	const game = new Game(ioTD, sockets.length)
+	//TODO socket.queue.mode
+	const game = new Game(ioTD, null, sockets.length)
 	for (const socket of sockets) {
 		leaveQueue(socket)
 		game.add(socket)
@@ -41,11 +42,14 @@ const popQueue = () => {
 }
 
 const queueToggle = (io, socket, queuing) => {
+	if (!queuing && !socket.queue) {
+		return
+	}
 	if (queueReadyTimer) {
 		clearTimeout(queueReadyTimer)
 		queueReadyTimer = null
 	}
-	socket.queued = queuing
+	socket.queue.in = queuing
 	const name = socket.user.name
 	if (queuing) {
 		socket.join('queue')
@@ -66,7 +70,6 @@ const queueToggle = (io, socket, queuing) => {
 
 module.exports = (io, socket) => {
 	ioTD = io
-	socket.queued = false
 
 	socket.on('lobby', (lobbying, callback) => {
 		if (lobbying) {
@@ -78,16 +81,17 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('queue', (queuing, callback) => {
-		socket.queueReady = false
+		socket.queue = {}
 		queueToggle(io, socket, queuing)
 		callback(QUEUE_WAIT)
 	})
-	socket.on('queue ready', (queuing) => {
-		socket.queueReady = queuing
+	socket.on('queue ready', ({ ready, mode }) => {
+		socket.queue.ready = ready
+		socket.queue.mode = mode
 	})
 
-	socket.on('singleplayer', () => {
-		const game = new Game(io, 1)
+	socket.on('singleplayer', (mode) => {
+		const game = new Game(io, mode, 1)
 		game.add(socket)
 	})
 
