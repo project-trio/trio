@@ -1,15 +1,14 @@
 const db = require.main.require('./helpers/db')
 const global = require.main.require('./helpers/global')
 
-const PUBLIC_FIELDS = 'id, user_id, body, EXTRACT(EPOCH FROM created_at) AS created_at, EXTRACT(EPOCH FROM updated_at) AS updated_at, target_id, target_type, reply_id, action'
-
 module.exports = {
 
 	async create (user, data) {
 		data.user_id = user.id
-		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING ${PUBLIC_FIELDS}`, data)
-		global.addActivity(user, activity)
-		return activity
+		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING id, EXTRACT(EPOCH FROM created_at)`, data)
+		data.id = activity.id
+		data.created_at = activity.created_at
+		global.addActivity(user, data)
 	},
 
 	update (id, body) {
@@ -17,7 +16,15 @@ module.exports = {
 	},
 
 	latest () {
-		return db.manyOrNone(`SELECT ${PUBLIC_FIELDS} FROM user_activities ORDER BY updated_at DESC LIMIT 100`)
+		return db.manyOrNone(`
+			SELECT a.id, a.user_id, a.body, EXTRACT(EPOCH FROM a.created_at) AS created_at, EXTRACT(EPOCH FROM a.updated_at) AS updated_at, a.target_id, a.target_type, a.reply_id, a.action, array_agg(r.user_id) AS r_uids, array_agg(r.reaction) AS r_emoji
+			FROM user_activities a
+			LEFT JOIN user_activity_reactions r
+				ON r.activity_id = id
+			GROUP BY a.id
+			ORDER BY updated_at, created_at DESC
+			LIMIT 100
+		`)
 	},
 
 	delete (id) {
@@ -25,13 +32,14 @@ module.exports = {
 	},
 
 	react (user, id, emoji) {
-		return db.oneOrNone(`INSERT INTO
+		db.oneOrNone(`INSERT INTO
 			user_activity_reactions(activity_id, user_id, reaction)
 			VALUES($1, $2, $3)
 			ON CONFLICT ON CONSTRAINT user_activity_reactions_pkey DO UPDATE
 				SET reaction = EXCLUDED.reaction, updated_at = EXCLUDED.updated_at
 			RETURNING 1
 		`, [ id, user.id, emoji ])
+		global.addReaction(user, id, emoji)
 	},
 
 }

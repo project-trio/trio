@@ -41,7 +41,7 @@ CREATE TABLE public.user_activities (
 	user_id integer,
 	body text,
 	created_at timestamp with time zone DEFAULT now() NOT NULL,
-	updated_at timestamp with time zone DEFAULT now() NOT NULL,
+	updated_at timestamp with time zone,
 	target_id integer,
 	target_type text,
 	reply_id integer,
@@ -81,6 +81,18 @@ CREATE TABLE public.user_game_scores (
 	score integer,
 	created_at timestamp with time zone DEFAULT now(),
 	updated_at timestamp with time zone DEFAULT now()
+);
+
+CREATE TABLE public.user_ratings (
+	user_id integer,
+	topic_id integer,
+	category text,
+	current integer,
+	peak integer,
+	games integer,
+	quits text,
+	created_at timestamp with time zone,
+	updated_at timestamp with time zone
 );
 
 CREATE TABLE public.user_sessions (
@@ -168,6 +180,12 @@ ALTER TABLE ONLY public.user_game_scores
 
 ALTER TABLE ONLY public.user_game_scores
 	ADD CONSTRAINT user_game_scores_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_ratings
+	ADD CONSTRAINT user_ratings_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_ratings
+	ADD CONSTRAINT user_ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.user_sessions
 	ADD CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;

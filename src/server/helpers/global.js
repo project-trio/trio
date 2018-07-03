@@ -8,6 +8,14 @@ let activities = []
 let users = {}
 let topics = {}
 
+const sendUpdate = (user, data) => {
+	data.user = {
+		id: user.id,
+		at: now(),
+	}
+	trio.in('home').emit('update action', data)
+}
+
 module.exports = {
 
 	initData () {
@@ -18,6 +26,7 @@ module.exports = {
 		trio = io.of('/trio')
 
 		activities = await require.main.require('./models/activity').latest()
+
 		const topicArray = await require.main.require('./models/topic').latest()
 		for (const topic of topicArray) {
 			topics[topic.id] = topic.name
@@ -43,18 +52,47 @@ module.exports = {
 		if (activities.length >= 100) {
 			activities.pop()
 		}
-		const currentTime = now()
-		if (currentTime - user.at > 30 * 1000) {
-			user.at = currentTime
-			trio.in('home').emit('user', user)
+		sendUpdate(user, { activity })
+	},
+
+	async addReaction (user, activityId, emoji) {
+		let activity = null
+		for (const checkActivity of activities) {
+			if (checkActivity.id === activityId) {
+				activity = checkActivity
+				break
+			}
 		}
-		trio.in('home').emit('activity', activity)
+		if (!activity) {
+			return
+		}
+		const userId = user.id
+		const uids = activity.r_uids
+		let updated = false
+		for (let idx = uids.length - 1; idx >= 0; idx -= 1) {
+			if (uids[idx] === userId) {
+				activity.r_emoji[idx] = emoji
+				updated = true
+				break
+			}
+		}
+		if (!updated) {
+			activity.r_uids.push(userId)
+			activity.r_emoji.push(emoji)
+		}
+		const sendActivity = {
+			id: activityId,
+			r_uids: activity.r_uids,
+			r_emoji: activity.r_emoji,
+		}
+		sendUpdate(user, { activity: sendActivity })
 	},
 
 	connectUser (socket, privateUser, game) {
 		const userId = privateUser.id
 		const existingUser = users[userId]
 		let user
+		let updateUser
 		if (existingUser) {
 			if (game && existingUser.gameName) {
 				return false
@@ -65,6 +103,11 @@ module.exports = {
 			} else {
 				existingUser.online += 1
 			}
+			updateUser = {
+				id: userId,
+				online: existingUser.online,
+				at: now(),
+			}
 			user = existingUser
 		} else {
 			user = {
@@ -74,16 +117,18 @@ module.exports = {
 				md5: privateUser.md5,
 				at: privateUser.at,
 				admin: privateUser.admin,
+				created_at: privateUser.created_at,
 				online: 1,
 			}
 			users[userId] = user
+			updateUser = user
 		}
 		socket.user = user
 		if (game) {
 			user.gameName = game
 		}
 		socket.emit('local', { id: user.id, name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
-		trio.in('home').emit('user', user)
+		trio.in('home').emit('update action', { user: updateUser })
 		return true
 	},
 
@@ -91,7 +136,7 @@ module.exports = {
 		const user = socket.user
 		user.online -= 1
 		if (user.online === 0) {
-			trio.in('home').emit('user', user)
+			trio.in('home').emit('update action', { user })
 		}
 	},
 
