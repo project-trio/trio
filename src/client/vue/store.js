@@ -93,10 +93,15 @@ export default new Vuex.Store({
 		ACTIVITY (state, activity) {
 			if (state.activities) {
 				if (activity.created_at) {
+					if (!activity.r_uids) {
+						activity.r_uids = []
+						activity.r_emoji = []
+					}
 					state.activities.unshift(activity)
 				} else {
+					const id = activity.id
 					for (const searchActivity of state.activities) {
-						if (searchActivity.id === activity.id) {
+						if (searchActivity.id === id) {
 							Object.assign(searchActivity, activity)
 							break
 						}

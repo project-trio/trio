@@ -16,7 +16,7 @@
 				</div>
 			</div>
 			<div v-else>
-				{{ action.body }}
+				{{ activity.body }}
 			</div>
 			&ensp;
 			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />

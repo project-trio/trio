@@ -37,7 +37,9 @@ socket.on('update action', ({ activity, user }) => {
 	if (activity) {
 		store.commit('ACTIVITY', activity)
 	}
-	store.commit('USER', user)
+	if (user) {
+		store.commit('USER', user)
+	}
 })
 
 export default socket
