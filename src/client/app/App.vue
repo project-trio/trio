@@ -135,6 +135,11 @@ ul
 	padding 0
 	list-style none
 
+.show-hover .show-hovered
+	visibility hidden
+.show-hover:hover .show-hovered
+	visibility visible
+
 //CONTROLS
 
 fieldset
@@ -147,12 +152,12 @@ fieldset
 
 button, textarea, input
 	outline none
+	box-sizing border-box
 
 .big
 	display block
 	margin 8px auto !important
 	max-width 100%
-	box-sizing border-box
 
 input.big
 	width 320px

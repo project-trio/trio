@@ -86,6 +86,4 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-li
-	margin 48px 0
 </style>
