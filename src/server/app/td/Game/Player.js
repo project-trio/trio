@@ -11,7 +11,7 @@ module.exports = class Player {
 		this.serverUpdate = null
 
 		this.waveNumber = 0
-		this.waveAt = 0
+		this.waveDuration = 0
 		this.lives = 20
 		this.wavesWon = 0
 

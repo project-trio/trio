@@ -20,8 +20,8 @@ const loop = function () {
 		for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
 			const player = gamePlayers[pidx]
 			if (player.waveNumber === game.waveCheck) {
-				if (!bestWaveTime || player.waveAt < bestWaveTime) {
-					bestWaveTime = player.waveAt
+				if (!bestWaveTime || player.waveDuration < bestWaveTime) {
+					bestWaveTime = player.waveDuration
 				}
 			}
 
@@ -40,7 +40,7 @@ const loop = function () {
 			if (sendResult) {
 				for (let pidx = 0; pidx < gamePlayers.length; pidx += 1) {
 					const player = gamePlayers[pidx]
-					if (player.waveNumber === game.waveCheck && player.waveAt === bestWaveTime) {
+					if (player.waveNumber === game.waveCheck && player.waveDuration === bestWaveTime) {
 						player.wavesWon += 1
 						winners.push(pidx)
 					}
@@ -54,7 +54,7 @@ const loop = function () {
 			} else {
 				wave = game.waveNumber
 				game.waveNumber += 1
-				game.duration += bestWaveTime + UPDATE_DURATION
+				game.duration += bestWaveTime + UPDATE_DURATION * 1.5
 			}
 		}
 
