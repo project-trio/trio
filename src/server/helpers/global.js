@@ -9,9 +9,12 @@ let users = {}
 let topics = {}
 
 const sendUpdate = (user, data) => {
-	data.user = {
-		id: user.id,
-		at: now(),
+	const currentTime = now()
+	if (currentTime > data.at + 5) {
+		data.user = {
+			id: user.id,
+			at: currentTime,
+		}
 	}
 	trio.in('home').emit('update action', data)
 }
@@ -63,22 +66,28 @@ module.exports = {
 				break
 			}
 		}
+
 		if (!activity) {
-			return
+			return console.log('No activity for reaction', user.id, activityId, emoji)
 		}
 		const userId = user.id
 		const uids = activity.r_uids
-		let updated = false
-		for (let idx = uids.length - 1; idx >= 0; idx -= 1) {
-			if (uids[idx] === userId) {
-				activity.r_emoji[idx] = emoji
-				updated = true
-				break
+		if (!uids) {
+			activity.r_uids = [ userId ]
+			activity.r_emoji = [ emoji ]
+		} else {
+			let updated = false
+			for (let idx = uids.length - 1; idx >= 0; idx -= 1) {
+				if (uids[idx] === userId) {
+					activity.r_emoji[idx] = emoji
+					updated = true
+					break
+				}
 			}
-		}
-		if (!updated) {
-			activity.r_uids.push(userId)
-			activity.r_emoji.push(emoji)
+			if (!updated) {
+				activity.r_uids.push(userId)
+				activity.r_emoji.push(emoji)
+			}
 		}
 		const sendActivity = {
 			id: activityId,

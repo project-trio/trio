@@ -5,7 +5,7 @@ module.exports = {
 
 	async create (user, data) {
 		data.user_id = user.id
-		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING id, EXTRACT(EPOCH FROM created_at)`, data)
+		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING id, EXTRACT(EPOCH FROM created_at) AS created_at`, data)
 		data.id = activity.id
 		data.created_at = activity.created_at
 		global.addActivity(user, data)
@@ -17,7 +17,7 @@ module.exports = {
 
 	latest () {
 		return db.manyOrNone(`
-			SELECT a.id, a.user_id, a.body, EXTRACT(EPOCH FROM a.created_at) AS created_at, EXTRACT(EPOCH FROM a.updated_at) AS updated_at, a.target_id, a.target_type, a.reply_id, a.action, array_agg(r.user_id) AS r_uids, array_agg(r.reaction) AS r_emoji
+			SELECT a.id, a.user_id, a.body, EXTRACT(EPOCH FROM a.created_at) AS created_at, EXTRACT(EPOCH FROM a.updated_at) AS updated_at, a.target_id, a.target_type, a.reply_id, a.action, array_remove(array_agg(r.user_id), NULL) AS r_uids, array_remove(array_agg(r.reaction), NULL) AS r_emoji
 			FROM user_activities a
 			LEFT JOIN user_activity_reactions r
 				ON r.activity_id = id

@@ -15,4 +15,18 @@ module.exports = (socket) => {
 		Activity.react(socket.user, data.id, data.emoji)
 	})
 
+	socket.on('submit post', async (data, callback) => {
+		if (!socket.user) {
+			return callback({ error: 'Authentication required '})
+		}
+		const activity = {
+			body: data.message,
+			target_id: data.targetId,
+			target_type: data.targetType,
+			reply_id: data.replyId,
+		}
+		await Activity.create(socket.user, activity)
+		callback()
+	})
+
 }
