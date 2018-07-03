@@ -1,6 +1,8 @@
 const { TESTING } = require.main.require('../common/constants')
+const { randomItem } = require.main.require('../common/utils')
 
 const Game = require('../Game')
+const { MODES } = require('../Game/config')
 
 const QUEUE_WAIT = TESTING ? 6 : 20
 
@@ -33,8 +35,17 @@ const popQueue = () => {
 	if (sockets.length < 2) {
 		return console.log('Queue not ready when popped')
 	}
-	//TODO socket.queue.mode
-	const game = new Game(ioTD, null, sockets.length)
+	let modeVotes = []
+	for (const socket of sockets) {
+		if (MODES.includes(socket.queue.mode)) {
+			modeVotes.push(socket.queue.mode)
+		}
+	}
+	if (!modeVotes.length) {
+		modeVotes = MODES
+	}
+	const mode = randomItem(modeVotes)
+	const game = new Game(ioTD, mode, sockets.length)
 	for (const socket of sockets) {
 		leaveQueue(socket)
 		game.add(socket)
