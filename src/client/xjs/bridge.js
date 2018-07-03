@@ -33,10 +33,10 @@ socket.on('error', (error) => {
 	window.location.reload(true)
 })
 
-socket.on('activity', (activity) => {
-	store.commit('ACTIVITY', activity)
-})
-socket.on('user', (user) => {
+socket.on('update action', ({ activity, user }) => {
+	if (activity) {
+		store.commit('ACTIVITY', activity)
+	}
 	store.commit('USER', user)
 })
 

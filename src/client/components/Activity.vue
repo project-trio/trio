@@ -22,7 +22,7 @@
 			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
 		<div class="activity-actions flex">
-			<!-- Reactions -->
+			<div v-for="reaction in activity.r_emoji" :key="reaction">{{ reaction }}</div>
 			<button @click="onShow('react')" class="show-hovered">{{ show === 'react' ? '⚉' : '⚇' }}</button>
 			<button @click="onShow('reply')" class="show-hovered borderless">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
 		</div>

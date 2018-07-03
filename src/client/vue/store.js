@@ -92,7 +92,16 @@ export default new Vuex.Store({
 		},
 		ACTIVITY (state, activity) {
 			if (state.activities) {
-				state.activities.unshift(activity)
+				if (activity.created_at) {
+					state.activities.unshift(activity)
+				} else {
+					for (const searchActivity of state.activities) {
+						if (searchActivity.id === activity.id) {
+							Object.assign(searchActivity, activity)
+							break
+						}
+					}
+				}
 			}
 		},
 
@@ -101,7 +110,11 @@ export default new Vuex.Store({
 		},
 		USER (state, user) {
 			if (state.users) {
-				state.users[user.id] = user
+				if (user.created_at) {
+					state.users[user.id] = user
+				} else {
+					state.users[user.id].at = user.at
+				}
 			}
 		},
 
