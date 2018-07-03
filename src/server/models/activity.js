@@ -24,4 +24,14 @@ module.exports = {
 		return db.oneOrNone(`DELETE FROM user_activities WHERE id = $1`, id)
 	},
 
+	react (user, id, emoji) {
+		return db.oneOrNone(`INSERT INTO
+			user_activity_reactions(activity_id, user_id, reaction)
+			VALUES($1, $2, $3)
+			ON CONFLICT ON CONSTRAINT user_activity_reactions_pkey DO UPDATE
+				SET reaction = EXCLUDED.reaction, updated_at = EXCLUDED.updated_at
+			RETURNING 1
+		`, [ id, user.id, emoji ])
+	},
+
 }

@@ -58,6 +58,14 @@ CREATE SEQUENCE public.user_activities_id_seq
 
 ALTER SEQUENCE public.user_activities_id_seq OWNED BY public.user_activities.id;
 
+CREATE TABLE public.user_activity_reactions (
+	activity_id integer NOT NULL,
+	user_id integer NOT NULL,
+	reaction text NOT NULL,
+	created_at timestamp with time zone DEFAULT now(),
+	updated_at timestamp with time zone DEFAULT now()
+);
+
 CREATE TABLE public.user_follows (
 	user_id integer NOT NULL,
 	target_id integer NOT NULL,
@@ -125,6 +133,9 @@ ALTER TABLE ONLY public.topics
 ALTER TABLE ONLY public.user_activities
 	ADD CONSTRAINT user_activities_pkey PRIMARY KEY (id);
 
+ALTER TABLE ONLY public.user_activity_reactions
+	ADD CONSTRAINT user_activity_reactions_pkey PRIMARY KEY (activity_id, user_id);
+
 ALTER TABLE ONLY public.user_follows
 	ADD CONSTRAINT user_follows_pkey PRIMARY KEY (user_id, target_id, target_type);
 
@@ -145,6 +156,12 @@ ALTER TABLE ONLY public.games
 
 ALTER TABLE ONLY public.user_activities
 	ADD CONSTRAINT user_activities_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_activity_reactions
+	ADD CONSTRAINT user_activity_reactions_activity_id_fkey FOREIGN KEY (activity_id) REFERENCES public.user_activities(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.user_activity_reactions
+	ADD CONSTRAINT user_activity_reactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.user_game_scores
 	ADD CONSTRAINT user_game_scores_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(id) ON UPDATE CASCADE ON DELETE CASCADE;
