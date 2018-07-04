@@ -11,7 +11,7 @@
 	<CreateActivity />
 	<ul v-if="activities">
 		<li v-for="activity in activities" :key="activity.id">
-			<Activity :activity="activity" />
+			<Activity :activity="activity" :asUser="userId" :asTopic="topicId" />
 		</li>
 	</ul>
 </div>
@@ -45,7 +45,7 @@ export default {
 			}
 		},
 		userId () {
-			return this.userFilter.id
+			return this.user && this.userFilter && this.userFilter.id
 		},
 
 		topicId () {
@@ -66,7 +66,7 @@ export default {
 		},
 
 		activities () {
-			const filterUserId = this.user && this.userFilter && this.userId
+			const filterUserId = this.user && this.userId
 			const filterTopicId = this.topic && this.topicId
 			const filterId = filterUserId || filterTopicId
 			const filterType = filterUserId ? 'user' : 'topic'

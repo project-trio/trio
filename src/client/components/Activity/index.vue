@@ -1,22 +1,28 @@
 <template>
 <div class="activity-item flex show-hover">
 	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
-	<div>
+	<div class="flex-fill">
 		<div class="flex">
-			<router-link class="activity-user flex" :to="{ name: 'User', params: { name } }">{{ name }}</router-link>
+			<router-link class="activity-user flex" :to="{ name: 'User', params: { name: fromName } }">{{ fromName }}</router-link>
 			&nbsp;
-			<div v-if="action">
+			<div v-if="action" class="flex-fill">
 				<div v-if="action === 'create'">
 					joined!
 				</div>
 				<div v-else-if="action === 'highscore'">
 					highscored
-					<router-link :to="{ name: 'Topic', params: { name: topic } }">{{ topic }}</router-link>
+					<router-link :to="{ name: 'Topic', params: { name: targetTopic } }">{{ targetTopic }}</router-link>
 					{{ highscoreDescription }}!
 				</div>
 			</div>
-			<Markdown v-else :raw="activity.body" />
-			&ensp;
+			<div v-else class="flex-fill">
+				<span v-if="headingName" class="text-faint">
+					{{ targetAsUser ? 'to' : 'in' }}
+					<span v-if="targetAsUser && headingName === fromName">self</span>
+					<router-link v-else :to="{ name: targetRoute, params: { name: headingName } }">{{ headingName }}</router-link>:
+				</span>
+				<Markdown :raw="activity.body" />
+			</div>
 			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
 		<div class="activity-actions flex">
@@ -57,6 +63,8 @@ export default {
 
 	props: {
 		activity: Object,
+		asUser: Number,
+		asTopic: Number,
 	},
 
 	data () {
@@ -71,7 +79,34 @@ export default {
 			return this.$store.state.users[this.activity.user_id]
 		},
 
-		topic () {
+		targetRoute () {
+			const target = this.activity.target_type
+			console.log(target && `${target.charAt(0).toUpperCase()}${target.slice(1)}`)
+			return target && `${target.charAt(0).toUpperCase()}${target.slice(1)}`
+		},
+		targetAsUser () {
+			return this.targetRoute === 'User'
+		},
+
+		headingName () {
+			if (this.targetRoute) {
+				if (this.targetAsUser) {
+					if (this.asUser !== this.activity.target_id) {
+						return this.targetUser && this.targetUser.name
+					}
+				} else {
+					if (this.asTopic !== this.activity.target_id) {
+						return this.targetTopic
+					}
+				}
+			}
+			return null
+		},
+
+		targetUser () {
+			return this.$store.state.users[this.activity.target_id]
+		},
+		targetTopic () {
 			return this.$store.state.topics[this.activity.target_id]
 		},
 
@@ -80,7 +115,7 @@ export default {
 			return split.join(' mode in ')
 		},
 
-		name () {
+		fromName () {
 			return this.user.name
 		},
 
@@ -130,6 +165,9 @@ export default {
 		background none
 		border 1px solid #d
 		border-radius 4px
+
+.flex-fill
+	flex-grow 1
 
 .popover
 	position absolute
