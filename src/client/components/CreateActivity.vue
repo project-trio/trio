@@ -47,7 +47,7 @@ export default {
 				} else if (targetType === 'topic') {
 					const topics = this.$store.state.topics
 					for (const tid in topics) {
-						if (topics[tid].name === name) {
+						if (topics[tid] === name) {
 							targetId = tid
 							break
 						}
