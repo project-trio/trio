@@ -19,7 +19,7 @@ The source for the [TD](https://github.com/ky-is/td) game is available to run al
 Install dependencies:
 ```console
 cd trio
-yarn
+npm install
 ```
 
 Run postgres server, and create a database named `trio`. Then import the structure file:
@@ -29,15 +29,15 @@ psql trio < db.sql
 
 Start the server:
 ```console
-yarn start
+npm start
 ```
 
 Hot-reload client:
 ```console
-yarn serve
+npm run serve
 ```
 
 Production build:
 ```console
-yarn build
+npm run build
 ```
