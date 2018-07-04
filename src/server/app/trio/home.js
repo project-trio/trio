@@ -21,9 +21,13 @@ module.exports = (socket) => {
 		}
 		const activity = {
 			body: data.message,
-			target_id: data.targetId,
 			target_type: data.targetType,
-			reply_id: data.replyId,
+		}
+		if (data.targetId !== undefined) {
+			activity.target_id = parseInt(data.targetId, 10)
+		}
+		if (data.replyId !== undefined) {
+			activity.reply_id = parseInt(data.replyId, 10)
 		}
 		await Activity.create(socket.user, activity)
 		callback()
