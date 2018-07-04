@@ -3,7 +3,7 @@
 	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
 	<div>
 		<div class="flex">
-			<router-link class="flex" :to="{ name: 'User', params: { name } }">{{ name }}</router-link>
+			<router-link class="activity-user flex" :to="{ name: 'User', params: { name } }">{{ name }}</router-link>
 			&nbsp;
 			<div v-if="action">
 				<div v-if="action === 'create'">
@@ -112,10 +112,14 @@ export default {
 
 <style lang="stylus" scoped>
 .activity-item
-	padding 24px 0
+	padding 16px 0
+
+.flex
+	align-items flex-start
 
 .avatar
 	margin-right 2px
+	flex-shrink 0
 
 .activity-actions
 	margin-top 2px
