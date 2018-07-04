@@ -117,8 +117,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="stylus">
-.ui-markdown p
-	margin-top 0
-</style>

@@ -126,7 +126,7 @@ a
 	text-align center
 
 .text-small
-	font-size 0.9em
+	font-size 0.8em
 
 .text-faint
 	color #9

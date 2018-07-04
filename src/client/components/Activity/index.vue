@@ -81,7 +81,6 @@ export default {
 
 		targetRoute () {
 			const target = this.activity.target_type
-			console.log(target && `${target.charAt(0).toUpperCase()}${target.slice(1)}`)
 			return target && `${target.charAt(0).toUpperCase()}${target.slice(1)}`
 		},
 		targetAsUser () {
@@ -179,4 +178,7 @@ export default {
 		border none
 		background none
 		font-size 24px
+
+.ui-markdown
+	margin -16px 0
 </style>
