@@ -7,6 +7,10 @@ import store from '@/client/vue/store'
 
 Vue.config.productionTip = false
 
+if (document.referrer && window.location.search === '?signin=1') {
+	store.dispatch('REDIRECT')
+}
+
 router.beforeEach((to, from, next) => {
 	const toName = to.name
 	const hasSignin = !!store.state.sessionToken
@@ -28,12 +32,6 @@ new Vue({
 	render: h => h(App),
 }).$mount('#app')
 
-//INIT
-
-if (router.currentRoute.query.signin && document.referrer) {
-	const token = store.state.sessionToken
-	if (token) {
-		const baseUrl = document.referrer.split('/?')[0]
-		window.location.replace(`${baseUrl}?token=${token}`)
-	}
+if (router.currentRoute.query) {
+	router.replace({ query: null })
 }

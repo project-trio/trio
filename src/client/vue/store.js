@@ -25,6 +25,7 @@ export default new Vuex.Store({
 		loading: 0,
 		reconnectAttempts: null,
 		changeEmail: null,
+		redirect: false,
 		local: {
 			name: null,
 			email: null,
@@ -42,22 +43,36 @@ export default new Vuex.Store({
 	},
 
 	actions: {
-		SIGNIN ({ commit }, data) {
+		SIGNIN ({ state, dispatch, commit }, data) {
 			send(commit, 'signin', data, (response) => {
 				const signinToken = response.token
 				commit('SET_EMAIL', { email: data.email, save: signinToken, registering: !!response.register })
 				if (signinToken) {
 					commit('SET_SESSION', signinToken)
+					if (state.redirect) {
+						dispatch('REDIRECT')
+					}
 				}
 			})
 		},
 
-		JOIN_HOME ({ commit}) {
+		JOIN_HOME ({ commit }) {
 			send(commit, 'join home', null, (response) => {
 				commit('ACTIVITIES', response.activities)
 				commit('USERS', response.users)
 				commit('TOPICS', response.topics)
 			})
+		},
+
+		REDIRECT ({ state, commit }) {
+			if (document.referrer && !document.referrer.includes(window.location.host)) {
+				const token = state.sessionToken
+				if (token) {
+					window.location.replace(`${document.referrer}?token=${token}`)
+				} else {
+					commit('REDIRECT')
+				}
+			}
 		},
 	},
 
@@ -72,6 +87,10 @@ export default new Vuex.Store({
 
 		LOADING (state, loading) {
 			state.loading += loading ? 1 : -1
+		},
+
+		REDIRECT (state) {
+			state.redirect = true
 		},
 
 		SET_EMAIL (state, { email, save, registering }) {
