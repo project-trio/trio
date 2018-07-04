@@ -15,9 +15,7 @@
 					{{ highscoreDescription }}!
 				</div>
 			</div>
-			<div v-else>
-				{{ activity.body }}
-			</div>
+			<Markdown v-else :raw="activity.body" />
 			&ensp;
 			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
@@ -43,6 +41,7 @@
 import { REACTION_EMOJI } from '@/common/constants'
 
 import Avatar from '@/client/components/Avatar'
+import Markdown from '@/client/components/UI/Markdown'
 import RelativeTime from '@/client/components/RelativeTime'
 
 import bridge from '@/client/xjs/bridge'
@@ -50,6 +49,7 @@ import bridge from '@/client/xjs/bridge'
 export default {
 	components: {
 		Avatar,
+		Markdown,
 		RelativeTime,
 	},
 
