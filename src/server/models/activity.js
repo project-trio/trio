@@ -22,7 +22,7 @@ module.exports = {
 			LEFT JOIN user_activity_reactions r
 				ON r.activity_id = id
 			GROUP BY a.id
-			ORDER BY updated_at, created_at DESC
+			ORDER BY COALESCE(a.updated_at, a.created_at) DESC
 			LIMIT 100
 		`)
 	},
