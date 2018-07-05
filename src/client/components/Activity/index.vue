@@ -1,13 +1,13 @@
 <template>
-<div class="activity-item flex show-hover">
+<div class="activity-item flex flex-top show-hover">
 	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
 	<div class="flex-fill">
-		<div class="flex">
+		<div class="flex flex-top">
 			<router-link class="activity-user flex" :to="{ name: 'User', params: { name: fromName } }">{{ fromName }}</router-link>
 			&nbsp;
 			<div v-if="action" class="flex-fill">
 				<div v-if="action === 'create'">
-					joined!
+					joined {{ new Date(activity.created_at * 1000).toLocaleDateString() }}!
 				</div>
 				<div v-else-if="action === 'highscore'">
 					highscored
@@ -23,12 +23,14 @@
 				</span>
 				<Markdown :raw="activity.body" />
 			</div>
-			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
 		<div class="activity-actions flex">
-			<div v-for="reaction in activity.r_emoji" :key="reaction">{{ reaction }}</div>
-			<button @click="onShow('react')" class="show-hovered">{{ show === 'react' ? '⚉' : '⚇' }}</button>
-			<button @click="onShow('reply')" class="show-hovered borderless">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
+			<div class="flex">
+				<div v-for="reaction in activity.r_emoji" :key="reaction">{{ reaction }}</div>
+				<button @click="onShow('react')" class="show-hovered">{{ show === 'react' ? '⚉' : '⚇' }}</button>
+				<button @click="onShow('reply')" class="show-hovered borderless">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
+			</div>
+			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
 		<div v-if="show === 'reply'">
 			<textarea v-model="replyMessage" class="big" placeholder="4 - 280 characters" />
@@ -148,7 +150,7 @@ export default {
 .activity-item
 	padding 16px 0
 
-.flex
+.flex-top
 	align-items flex-start
 
 .avatar
@@ -157,6 +159,7 @@ export default {
 
 .activity-actions
 	margin-top 2px
+	justify-content space-between
 	& > *
 		margin-right 4px
 	& button

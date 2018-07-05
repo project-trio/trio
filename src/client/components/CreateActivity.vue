@@ -24,9 +24,15 @@ export default {
 		},
 
 		messagePlaceholder () {
-			const prefix = this.$route.name === 'User' ? 'to' : 'in'
 			const name = this.targetName
-			return name ? `Message ${prefix} ${name}` : 'Update your status'
+			if (name) {
+				if (this.$route.name === 'User') {
+					const isLocal = name.toLowerCase() === this.$store.state.local.name.toLowerCase()
+					return `Message to ${isLocal ? 'yourself' : name}`
+				}
+				return `Message in ${name}`
+			}
+			return 'Update your status'
 		},
 	},
 
