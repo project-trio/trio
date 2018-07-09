@@ -1,12 +1,12 @@
 const { now } = require.main.require('../common/utils')
 
-const User = require.main.require('./models/user')
-
 let trio
 
 let activities = []
 let users = {}
 let topics = {}
+let scores = {}
+let gameUsers = {}
 
 const sendUpdate = (user, data) => {
 	const currentTime = now()
@@ -36,6 +36,23 @@ module.exports = {
 		}
 
 		const userIds = new Set()
+
+		const gameModel = require.main.require('./models/game')
+		const tdNormal = await gameModel.scores(2, 'normal')
+		const tdRandom = await gameModel.scores(2, 'random')
+		scores = {
+			2: {
+				normal: tdNormal,
+				random: tdRandom,
+			},
+		}
+		for (const scoreRow of tdNormal) {
+			userIds.add(scoreRow[0])
+		}
+		for (const scoreRow of tdRandom) {
+			userIds.add(scoreRow[0])
+		}
+
 		for (const activity of activities) {
 			userIds.add(activity.user_id)
 			if (activity.target_type === 'user') {
@@ -43,12 +60,31 @@ module.exports = {
 			}
 		}
 		if (userIds.size) {
-			const activityUsers = await User.all(Array.from(userIds), true)
+			const activityUsers = await require.main.require('./models/user').all(Array.from(userIds), true)
 			for (const user of activityUsers) {
 				users[user.id] = user
 			}
 		}
+
+		for (const topicId in scores) {
+			const topicScores = scores[topicId]
+			const topicUsers = {}
+			gameUsers[topicId] = topicUsers
+			for (const mode in topicScores) {
+				const modeScores = topicScores[mode]
+				for (const score of modeScores) {
+					const uid = score[0]
+					topicUsers[uid] = users[uid]
+				}
+			}
+		}
 	},
+
+	getGame (topicId) {
+		return { users: gameUsers[topicId], scores: scores[topicId] }
+	},
+
+	// Activity
 
 	async addActivity (user, activity) {
 		activities.unshift(activity)
@@ -96,6 +132,8 @@ module.exports = {
 		}
 		sendUpdate(user, { activity: sendActivity })
 	},
+
+	// User
 
 	connectUser (socket, privateUser, game) {
 		const userId = privateUser.id

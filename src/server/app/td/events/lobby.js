@@ -1,6 +1,8 @@
 const { TESTING } = require.main.require('../common/constants')
 const { randomItem } = require.main.require('../common/utils')
 
+const global = require.main.require('./helpers/global')
+
 const Game = require('../Game')
 const { MODES } = require('../Game/config')
 
@@ -88,7 +90,11 @@ module.exports = (io, socket) => {
 		} else {
 			socket.leave('lobby')
 		}
-		callback && callback(queuingSockets.map(socket => socket.user.name))
+		if (callback) {
+			const gameData = global.getGame(2)
+			gameData.names = queuingSockets.map(socket => socket.user.name)
+			callback(gameData)
+		}
 	})
 
 	socket.on('queue', (queuing, callback) => {
