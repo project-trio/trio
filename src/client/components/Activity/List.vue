@@ -9,7 +9,7 @@
 		<p v-if="topicLink">Play now: <a :href="topicLink" target="_blank">{{ topicLink }}</a></p>
 	</div>
 	<CreateActivity />
-	<ul v-if="activities">
+	<ul v-if="activities" class="unstyled">
 		<li v-for="activity in activities" :key="activity.id">
 			<Activity :activity="activity" :asUser="userId" :asTopic="topicId" />
 		</li>

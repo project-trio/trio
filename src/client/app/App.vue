@@ -132,8 +132,14 @@ a
 	color #9
 
 ul
-	padding 0
-	list-style none
+	list-style initial
+	padding-left 30px
+	&.unstyled
+		padding 0
+		list-style none
+
+p + ul
+	margin-top -12px
 
 .show-hover .show-hovered
 	visibility hidden
