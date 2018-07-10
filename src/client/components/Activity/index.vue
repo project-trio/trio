@@ -183,6 +183,6 @@ export default {
 		background none
 		font-size 24px
 
-.ui-markdown
-	margin -16px 0
+.markdown-poi
+	margin -12px 0
 </style>
