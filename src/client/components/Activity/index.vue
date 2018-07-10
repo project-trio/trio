@@ -21,7 +21,7 @@
 					<span v-if="targetAsUser && headingName === fromName">self</span>
 					<router-link v-else :to="{ name: targetRoute, params: { name: headingName } }">{{ headingName }}</router-link>:
 				</span>
-				<Markdown :raw="activity.body" />
+				<MarkdownPoi :raw="activity.body" />
 			</div>
 		</div>
 		<div class="activity-actions flex">
@@ -46,10 +46,11 @@
 </template>
 
 <script>
+import MarkdownPoi from '@ky-is/vue-markdown-poi'
+
 import { REACTION_EMOJI } from '@/common/constants'
 
 import Avatar from '@/client/components/Avatar'
-import Markdown from '@/client/components/UI/Markdown'
 import RelativeTime from '@/client/components/RelativeTime'
 
 import bridge from '@/client/xjs/bridge'
@@ -57,7 +58,7 @@ import bridge from '@/client/xjs/bridge'
 export default {
 	components: {
 		Avatar,
-		Markdown,
+		MarkdownPoi,
 		RelativeTime,
 	},
 
