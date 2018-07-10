@@ -14,7 +14,8 @@ if (document.referrer && window.location.search === '?signin=1') {
 router.beforeEach((to, from, next) => {
 	const toName = to.name
 	const hasSignin = !!store.state.sessionToken
-	if (toName === 'Signin') {
+	const signinRoute = toName === 'Signin' || toName === 'Passcode'
+	if (signinRoute) {
 		if (hasSignin) {
 			return next({ name: 'Home' })
 		}
