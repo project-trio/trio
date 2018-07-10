@@ -26,7 +26,7 @@ class Game {
 		this.serverUpdate = 0
 		this.idleCount = 0
 		this.singleplayer = playerCount <= 1
-		this.updatesUntilStart = (TESTING && playerCount <= 1 ? 2 : 15) * 1000 / UPDATE_DURATION
+		this.updatesUntilStart = (TESTING && playerCount <= 1 ? 3 : 15) * 1000 / UPDATE_DURATION
 
 		this.waves = 50 //SAMPLE
 		this.wavesFinished = false
