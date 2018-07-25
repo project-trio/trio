@@ -1,11 +1,11 @@
-const global = require.main.require('./helpers/global')
+const live = require.main.require('./helpers/live')
 const middleware = require.main.require('./helpers/middleware')
 
 const Activity = require.main.require('./models/activity')
 
 module.exports = (socket) => {
 	middleware.page(socket, 'home', (data, callback) => {
-		callback(global.initData())
+		callback(live.initData())
 	})
 
 	socket.on('activity react', async (data, callback) => {

@@ -1,5 +1,5 @@
 const db = require.main.require('./helpers/db')
-const global = require.main.require('./helpers/global')
+const live = require.main.require('./helpers/live')
 
 module.exports = {
 
@@ -8,7 +8,7 @@ module.exports = {
 		const activity = await db.one(`INSERT INTO user_activities($[this:name]) VALUES($[this:list]) RETURNING id, EXTRACT(EPOCH FROM created_at) AS created_at`, data)
 		data.id = activity.id
 		data.created_at = activity.created_at
-		global.addActivity(user, data)
+		live.addActivity(user, data)
 	},
 
 	update (id, body) {
@@ -39,7 +39,7 @@ module.exports = {
 				SET reaction = EXCLUDED.reaction, updated_at = EXCLUDED.updated_at
 			RETURNING 1
 		`, [ id, user.id, emoji ])
-		global.addReaction(user, id, emoji)
+		live.addReaction(user, id, emoji)
 	},
 
 }

@@ -1,4 +1,4 @@
-const global = require.main.require('./helpers/global')
+const live = require.main.require('./helpers/live')
 
 const Session = require.main.require('./models/session')
 const User = require.main.require('./models/user')
@@ -23,7 +23,7 @@ const auth = async (socket, next) => {
 			if (!user) {
 				return authError(next, isGame, 'signin user')
 			}
-			if (!global.connectUser(socket, user, game)) {
+			if (!live.connectUser(socket, user, game)) {
 				return authError(next, false, 'Already in game')
 			}
 		} catch (error) {
@@ -55,7 +55,7 @@ module.exports = {
 					if (user.gameName === socket.nsp.name) {
 						user.gameName = null
 					}
-					global.disconnect(socket)
+					live.disconnect(socket)
 				}
 			})
 		})

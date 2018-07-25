@@ -21,7 +21,7 @@ require('./app/td')(io)
 
 //HYDRATE
 
-require.main.require('./helpers/global').init(io)
+require.main.require('./helpers/live').init(io)
 
 //APP
 

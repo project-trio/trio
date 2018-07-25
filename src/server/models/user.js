@@ -1,7 +1,7 @@
 const { randomRange } = require.main.require('../common/utils')
 
 const db = require.main.require('./helpers/db')
-const global = require.main.require('./helpers/global')
+const live = require.main.require('./helpers/live')
 
 const PUBLIC_FIELDS = 'id, name, ccid, md5, EXTRACT(EPOCH FROM updated_at) AS at, admin'
 const FIELDS = `${PUBLIC_FIELDS}, email, passcode, EXTRACT(EPOCH FROM passcode_at) AS passcode_at, passcode_attempts, email_status, email_change`
@@ -38,7 +38,7 @@ module.exports = {
 				WHERE EXCLUDED.score ${increases ? '>' : '<'} user_game_scores.score
 			RETURNING score
 		`, [ user.id, topicId, mode, score ])
-		global.addHighscore(user, topicId, mode, highscore.score)
+		live.addHighscore(user, topicId, mode, highscore.score)
 	},
 
 	// Passcode

@@ -3,7 +3,7 @@ const request = require('request')
 const CommonValidator = require.main.require('../common/validator')
 const { now } = require.main.require('../common/utils')
 
-const global = require.main.require('./helpers/global')
+const live = require.main.require('./helpers/live')
 const mailer = require.main.require('./helpers/mailer')
 
 const Activity = require.main.require('./models/activity')
@@ -26,7 +26,7 @@ async function makePasscode (user, callback) {
 
 async function makeSession (socket, user, callback) {
 	const session = await Session.create(user)
-	global.connectUser(socket, user)
+	live.connectUser(socket, user)
 	callback({ token: session.id })
 }
 
