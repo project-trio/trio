@@ -1,6 +1,7 @@
 const { randomRange } = require.main.require('../common/utils')
 
 const db = require.main.require('./helpers/db')
+const global = require.main.require('./helpers/global')
 
 const PUBLIC_FIELDS = 'id, name, ccid, md5, EXTRACT(EPOCH FROM updated_at) AS at, admin'
 const FIELDS = `${PUBLIC_FIELDS}, email, passcode, EXTRACT(EPOCH FROM passcode_at) AS passcode_at, passcode_attempts, email_status, email_change`
@@ -28,15 +29,16 @@ module.exports = {
 		return db.manyOrNone(`UPDATE users SET game_count = game_count + 1, updated_at = CURRENT_TIMESTAMP WHERE id IN ($1)`, userIds)
 	},
 
-	highscore (user, topicId, mode, score, increases) {
-		return db.oneOrNone(`INSERT INTO
+	async highscore (user, topicId, mode, score, increases) {
+		let highscore = await db.oneOrNone(`INSERT INTO
 			user_game_scores(user_id, topic_id, mode, score)
 			VALUES($1, $2, $3, $4)
 			ON CONFLICT ON CONSTRAINT user_game_scores_pkey DO UPDATE
 				SET score = EXCLUDED.score, updated_at = EXCLUDED.updated_at
 				WHERE EXCLUDED.score ${increases ? '>' : '<'} user_game_scores.score
-			RETURNING 1
+			RETURNING score
 		`, [ user.id, topicId, mode, score ])
+		global.addHighscore(user, topicId, mode, highscore.score)
 	},
 
 	// Passcode

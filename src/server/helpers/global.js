@@ -84,9 +84,32 @@ module.exports = {
 		return { users: gameUsers[topicId], scores: scores[topicId] }
 	},
 
+	addHighscore (user, topicId, mode, score) {
+		const uid = user.id
+		const modeScores = scores[topicId][mode]
+		if (modeScores.length) {
+			let updatedScore = false
+			for (let idx = 0; idx < modeScores.length; idx += 1) {
+				const modeScore = modeScores[idx]
+				if (updatedScore) {
+					if (modeScore[0] === uid) {
+						modeScores.splice(idx, 1)
+						break
+					}
+				} else if (modeScore[1] > score) {
+					modeScores.splice(idx, 0, [ uid, score ])
+					gameUsers[topicId][uid] = users[uid]
+					updatedScore = true
+				}
+			}
+		} else {
+			modeScores.push([ uid, score ])
+		}
+	},
+
 	// Activity
 
-	async addActivity (user, activity) {
+	addActivity (user, activity) {
 		activities.unshift(activity)
 		if (activities.length >= 100) {
 			activities.pop()
@@ -94,7 +117,7 @@ module.exports = {
 		sendUpdate(user, { activity })
 	},
 
-	async addReaction (user, activityId, emoji) {
+	addReaction (user, activityId, emoji) {
 		let activity = null
 		for (const checkActivity of activities) {
 			if (checkActivity.id === activityId) {
