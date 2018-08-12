@@ -20,20 +20,20 @@
 		"dotenv": "^6.0.0",
 		"express": "^4.16.3",
 		"pg-promise": "^8.4.4",
-		"request": "^2.87.0",
+		"request": "^2.88.0",
 		"socket.io": "^2.1.1"
 	},
 	"devDependencies": {
 		"@ky-is/vue-markdown-poi": "^0.2.0",
-		"@vue/cli-plugin-babel": "^3.0.0-rc.5",
-		"@vue/cli-plugin-eslint": "^3.0.0-rc.5",
-		"@vue/cli-service": "^3.0.0-rc.5",
+		"@vue/cli-plugin-babel": "^3.0.0",
+		"@vue/cli-plugin-eslint": "^3.0.0",
+		"@vue/cli-service": "^3.0.0",
 		"spark-md5": "^3.0.0",
 		"stylus": "^0.54.5",
 		"stylus-loader": "^3.0.2",
-		"vue": "^2.5.16",
+		"vue": "^2.5.17",
 		"vue-router": "^3.0.1",
-		"vue-template-compiler": "^2.5.16",
+		"vue-template-compiler": "^2.5.17",
 		"vuex": "^3.0.1"
 	},
 	"babel": {
@@ -46,9 +46,15 @@
 			"autoprefixer": {}
 		}
 	},
-	"browserslist": [
-		"> 1%",
-		"last 2 versions",
-		"not ie <= 8"
-	]
+	"browserslist": {
+		"production": [
+			"> 1%",
+			"last 2 versions",
+			"not ie <= 8"
+		],
+		"development": [
+			"last 1 version",
+			"not dead"
+		]
+	}
 }
