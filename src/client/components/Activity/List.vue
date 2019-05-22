@@ -60,7 +60,7 @@ export default {
 		},
 		topicLink () {
 			if (this.topic === 'TD') {
-				return 'https://td.suzu.online'
+				return 'https://ttd.netlify.com'
 			}
 			if (this.topic === 'Moba') {
 				return 'https://moba.suzu.online'
