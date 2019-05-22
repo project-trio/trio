@@ -40,7 +40,7 @@ class Game {
 		games.push(this)
 	}
 
-//PRIVATE
+	//PRIVATE
 
 	playerById (id) {
 		for (const player of this.players) {
@@ -76,7 +76,7 @@ class Game {
 		return result
 	}
 
-//JOIN
+	//JOIN
 
 	formattedPlayers () {
 		const broadcastPlayers = []
@@ -148,7 +148,7 @@ class Game {
 		})
 	}
 
-//LEAVE
+	//LEAVE
 
 	checkFinished () {
 		for (const player of this.players) {

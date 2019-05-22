@@ -1,5 +1,5 @@
 <template>
-<form @submit.prevent="onSubmit" class="text-center">
+<form class="text-center" @submit.prevent="onSubmit">
 	<p v-if="!signinEmail">Enter your email to begin</p>
 	<p v-else-if="registering">Create an account</p>
 	<p v-else>Enter the passcode sent to your email</p>
@@ -8,7 +8,7 @@
 		<div v-else-if="registering" class="register-line">
 			<Avatar :size="64" :ccid="enableCC ? ccid : null" :md5="md5" />
 			<div class="name-input">
-				<input v-model="name" type="text" class="big" :class="nameError" placeholder="Name (3-16 alphanumeric)" autocomplete="off">
+				<input v-model="name" :class="nameError" type="text" class="big" placeholder="Name (3-16 alphanumeric)" autocomplete="off">
 				<div v-if="nameError" class="text-small text-faint">
 					{{ nameError === 'taken' ? 'Sorry, this name has already been registered' : 'Invalid name' }}
 				</div>
@@ -82,7 +82,7 @@ export default {
 	},
 
 	methods: {
-		onSubmit() {
+		onSubmit () {
 			const key = !this.passcode ? 'email' : 'passcode'
 			const value = this[key]
 			const error = Validator[key](value)

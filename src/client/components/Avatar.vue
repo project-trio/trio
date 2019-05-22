@@ -1,5 +1,5 @@
 <template>
-<div class="avatar" :style="{ 'background-image': `url(${avatarUrl})`, width: `${size}px`, height: `${size}px` }" />
+<div :style="{ 'background-image': `url(${avatarUrl})`, width: `${size}px`, height: `${size}px` }" class="avatar" />
 </template>
 
 <script>

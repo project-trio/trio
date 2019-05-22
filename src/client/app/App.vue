@@ -38,7 +38,7 @@ export default {
 		window.addEventListener('focus', this.setCountdown, true)
 	},
 
-	beforeDestroy() {
+	beforeDestroy () {
 		window.removeEventListener('blur', this.cancelCountdown, true)
 		window.removeEventListener('focus', this.setCountdown, true)
 	},

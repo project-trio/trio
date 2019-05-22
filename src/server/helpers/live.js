@@ -3,10 +3,10 @@ const { now } = require.main.require('../common/utils')
 let trio
 
 let activities = []
-let users = {}
-let topics = {}
+const users = {}
+const topics = {}
 let scores = {}
-let gameUsers = {}
+const gameUsers = {}
 
 const sendUpdate = (user, data) => {
 	const currentTime = now()

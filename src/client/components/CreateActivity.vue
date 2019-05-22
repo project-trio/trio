@@ -1,7 +1,7 @@
 <template>
 <form @submit.prevent="onSubmit">
 	<fieldset :disabled="submitting">
-		<textarea v-model="message" class="big" :placeholder="messagePlaceholder" />
+		<textarea v-model="message" :placeholder="messagePlaceholder" class="big" />
 		<button v-if="message" type="submit" class="big">Submit</button>
 	</fieldset>
 </form>
@@ -37,7 +37,7 @@ export default {
 	},
 
 	methods: {
-		onSubmit() {
+		onSubmit () {
 			const name = this.targetName
 			let targetId, targetType
 			if (name) {

@@ -19,4 +19,20 @@ module.exports = {
 		})
 	},
 
+	userScores (user) {
+		return db.manyOrNone(`
+			SELECT topic_id, mode, score,
+				(SELECT rank
+				FROM (
+						SELECT user_id, topic_id, mode, RANK() OVER (ORDER BY score desc) AS rank
+						FROM user_game_scores
+						WHERE topic_id = ugs.topic_id AND mode = ugs.mode
+					) igs
+				WHERE user_id = 1)
+			FROM user_game_scores ugs
+			WHERE user_id = 1
+			ORDER BY updated_at DESC
+		`, user.id)
+	},
+
 }

@@ -11,13 +11,13 @@ const sendSendgrid = (message, multi, templateId, onSuccess, onError) => {
 	message.substitutions.base_url = process.env.BASE_URL
 	message.templateId = templateId
 	sendgridMail.send(message, multi)
-	.then(onSuccess)
-	.catch(error => {
-		console.log(error.toString(), message)
-		if (onError) {
-			onError()
-		}
-	})
+		.then(onSuccess)
+		.catch(error => {
+			console.log(error.toString(), message)
+			if (onError) {
+				onError()
+			}
+		})
 }
 
 module.exports = {

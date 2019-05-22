@@ -30,7 +30,7 @@ module.exports = {
 	},
 
 	async highscore (user, topicId, mode, score, increases) {
-		let highscore = await db.oneOrNone(`INSERT INTO
+		const highscore = await db.oneOrNone(`INSERT INTO
 			user_game_scores(user_id, topic_id, mode, score)
 			VALUES($1, $2, $3, $4)
 			ON CONFLICT ON CONSTRAINT user_game_scores_pkey DO UPDATE

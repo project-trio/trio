@@ -6,41 +6,58 @@
 	"scripts": {
 		"serve": "vue-cli-service serve",
 		"start": "node src/server/index.js",
-		"build": "vue-cli-service build --modern",
-		"schema": "pg_dump --schema-only --no-owner --no-privileges trio | sed -e '/^--/d' -e '/^SET/d' -e '/^COMMENT ON/d' -e 's/    /\t/g' | sed '/^$/N;/^\\n$/D' > db.sql",
-		"lint": "vue-cli-service lint"
+		"b": "vue-cli-service build --modern",
+		"schema": "pg_dump --schema-only --no-owner --no-privileges trio | sed -e '/^--/d' -e '/^SET/d' -e '/^COMMENT ON/d' -e 's/    /\t/g' | sed '/^$/N;/^\\n$/D' > db.sql"
 	},
 	"engines": {
 		"node": "^10.0",
 		"npm": "^6.0"
 	},
 	"dependencies": {
-		"@sendgrid/mail": "^6.3.1",
-		"bluebird": "^3.5.1",
-		"dotenv": "^6.0.0",
-		"express": "^4.16.3",
-		"pg-promise": "^8.4.4",
+		"@sendgrid/mail": "^6.4.0",
+		"bluebird": "^3.5.4",
+		"dotenv": "^8.0.0",
+		"express": "^4.17.0",
+		"pg-promise": "^8.7.2",
 		"request": "^2.88.0",
-		"socket.io": "^2.1.1"
+		"socket.io": "^2.2.0"
 	},
 	"devDependencies": {
-		"@ky-is/eslint-config": "^1.0.0",
-		"@ky-is/vue-markdown-poi": "^0.2.0",
-		"@vue/cli-plugin-babel": "^3.0.0",
-		"@vue/cli-plugin-eslint": "^3.0.0",
-		"@vue/cli-service": "^3.0.0",
+		"@ky-is/eslint-config": "^1.7.0",
+		"@ky-is/vue-markdown-poi": "^0.2.1",
+		"@vue/cli-plugin-babel": "^3.7.0",
+		"@vue/cli-plugin-eslint": "^3.7.0",
+		"@vue/cli-service": "^3.7.0",
+		"eslint": "^5.16.0",
+		"eslint-plugin-vue": "^5.2.2",
 		"spark-md5": "^3.0.0",
 		"stylus": "^0.54.5",
 		"stylus-loader": "^3.0.2",
-		"vue": "^2.5.17",
-		"vue-router": "^3.0.1",
-		"vue-template-compiler": "^2.5.17",
-		"vuex": "^3.0.1"
+		"vue": "^2.6.10",
+		"vue-router": "^3.0.6",
+		"vue-template-compiler": "^2.6.10",
+		"vuex": "^3.1.1"
 	},
 	"babel": {
 		"presets": [
-			"@vue/app"
+			[
+				"@vue/app",
+				{
+					"jsx": false,
+					"loose": true,
+					"modules": "commonjs"
+				}
+			]
 		]
+	},
+	"eslintConfig": {
+		"extends": "@ky-is/eslint-config/vue",
+		"parserOptions": {
+			"parser": "babel-eslint"
+		},
+		"rules": {
+			"vue/require-default-prop": "off"
+		}
 	},
 	"postcss": {
 		"plugins": {

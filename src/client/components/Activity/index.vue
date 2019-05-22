@@ -3,7 +3,9 @@
 	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
 	<div class="flex-fill">
 		<div class="flex flex-top">
-			<router-link class="activity-user flex" :to="{ name: 'User', params: { name: fromName } }">{{ fromName }}</router-link>
+			<router-link :to="{ name: 'User', params: { name: fromName } }" class="activity-user flex">
+				{{ fromName }}
+			</router-link>
 			&nbsp;
 			<div v-if="action" class="flex-fill">
 				<div v-if="action === 'create'">
@@ -27,18 +29,18 @@
 		<div class="activity-actions flex">
 			<div class="flex">
 				<div v-for="reaction in activity.r_emoji" :key="reaction">{{ reaction }}</div>
-				<button @click="onShow('react')" class="show-hovered">{{ show === 'react' ? '⚉' : '⚇' }}</button>
-				<button @click="onShow('reply')" class="show-hovered borderless">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
+				<button class="show-hovered" @click="onShow('react')">{{ show === 'react' ? '⚉' : '⚇' }}</button>
+				<button class="show-hovered borderless" @click="onShow('reply')">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
 			</div>
 			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
 		</div>
 		<div v-if="show === 'reply'">
-			<textarea v-model="replyMessage" class="big" placeholder="4 - 280 characters" />
-			<button @click="onReply" class="big">Send</button>
+			<textarea v-model="replyMessage" class="big" placeholder="4–280 characters" />
+			<button class="big" @click="onReply">Send</button>
 		</div>
 		<div v-else-if="show === 'react'" class="popover show-hovered">
 			<div v-for="(emojiRow, idx) in $options.reactionEmoji" :key="idx">
-				<button v-for="emoji in emojiRow" @click="onEmoji(emoji)" :key="emoji">{{ emoji }}</button>
+				<button v-for="emoji in emojiRow" :key="emoji" @click="onEmoji(emoji)">{{ emoji }}</button>
 			</div>
 		</div>
 	</div>

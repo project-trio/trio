@@ -43,6 +43,7 @@ export default {
 					return user
 				}
 			}
+			return console.log('UNKNOWN USER')
 		},
 		userId () {
 			return this.user && this.userFilter && this.userFilter.id
@@ -55,6 +56,7 @@ export default {
 					return parseInt(id, 10)
 				}
 			}
+			return console.log('UNKNOWN TOPICS')
 		},
 		topicLink () {
 			if (this.topic === 'TD') {
@@ -63,6 +65,7 @@ export default {
 			if (this.topic === 'Moba') {
 				return 'https://moba.suzu.online'
 			}
+			return console.log('UNKNOWN TOPIC', this.topic)
 		},
 
 		activities () {
