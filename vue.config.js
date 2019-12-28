@@ -1,5 +1,5 @@
 module.exports = {
-	lintOnSave: true,
+	outputDir: '~$dist',
 	productionSourceMap: false,
 
 	devServer: {
@@ -7,7 +7,7 @@ module.exports = {
 		port: 8030,
 		proxy: {
 			'/socket.io': {
-				target: 'http://192.168.0.11:8031',
+				target: 'http://localhost:8031',
 				changeOrigin: true,
 			},
 		},
@@ -15,5 +15,12 @@ module.exports = {
 
 	pages: {
 		index: { entry: 'src/client/app/main.js' },
+	},
+
+	chainWebpack (config) {
+		config.optimization.minimizer('terser').tap((args) => {
+			args[0].terserOptions.compress.drop_console = true
+			return args
+		})
 	},
 }

@@ -25,10 +25,10 @@ require.main.require('./helpers/live').init(io)
 
 //APP
 
-app.use(express.static('dist'))
+app.use(express.static('~$dist'))
 
 app.get('*', (request, response, _next) => {
-	response.sendFile(path.resolve(__dirname, '../../dist/index.html'))
+	response.sendFile(path.resolve(__dirname, '../../~$dist/index.html'))
 })
 
 //LISTEN
