@@ -1,30 +1,28 @@
 <template>
-<div class="activity-item flex flex-top show-hover">
+<div class="activity-item pre flex flex-top show-hover">
 	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
 	<div class="flex-fill">
 		<div class="flex flex-top">
-			<router-link :to="{ name: 'User', params: { name: fromName } }" class="activity-user flex">
-				{{ fromName }}
-			</router-link>
-			&nbsp;
-			<div v-if="action" class="flex-fill">
-				<div v-if="action === 'create'">
+			<router-link :to="{ name: 'User', params: { name: fromName } }" class="activity-user flex">{{ fromName }}</router-link>
+			<span v-if="action" class="flex-fill">
+				<span v-if="action === 'create'">
 					joined {{ new Date(activity.created_at * 1000).toLocaleDateString() }}!
-				</div>
-				<div v-else-if="action === 'highscore'">
+				</span>
+				<span v-else-if="action === 'highscore'">
 					highscored
 					<router-link :to="{ name: 'Topic', params: { name: targetTopic } }">{{ targetTopic }}</router-link>
 					{{ highscoreDescription }}!
-				</div>
-			</div>
-			<div v-else class="flex-fill">
+				</span>
+			</span>
+			<span v-else>
 				<span v-if="headingName" class="text-faint">
 					{{ targetAsUser ? 'to' : 'in' }}
 					<span v-if="targetAsUser && headingName === fromName">self</span>
 					<router-link v-else :to="{ name: targetRoute, params: { name: headingName } }">{{ headingName }}</router-link>:
-				</span>
-				<MarkdownPoi :raw="activity.body" />
-			</div>
+					</span>
+					<span v-else>: </span>
+				<MarkdownPoi :raw="activity.body" :tag="headingName ? 'div' : 'span'" :inline="!headingName"/>
+			</span>
 		</div>
 		<div class="activity-actions flex">
 			<div class="flex">
@@ -152,6 +150,9 @@ export default {
 <style lang="stylus" scoped>
 .activity-item
 	padding 16px 0
+
+.pre
+	white-space pre
 
 .flex-top
 	align-items flex-start
