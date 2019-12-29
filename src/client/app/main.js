@@ -33,6 +33,15 @@ new Vue({
 	render: h => h(App),
 }).$mount('#app')
 
-if (router.currentRoute.query) {
+function isEmpty (obj) {
+	for (const _ in obj) {
+		return false
+	}
+	return true
+}
+
+// SETUP
+
+if (!isEmpty(router.currentRoute.query)) {
 	router.replace({ query: null })
 }
