@@ -74,7 +74,10 @@ export default {
 			const filterId = filterUserId || filterTopicId
 			const filterType = filterUserId ? 'user' : 'topic'
 			const activities = this.$store.state.activities
-			return !filterId ? activities : activities.filter(activity => {
+			if (!filterId) {
+				return activities
+			}
+			return activities.filter(activity => {
 				if (filterUserId && activity.user_id === filterUserId) {
 					return true
 				}

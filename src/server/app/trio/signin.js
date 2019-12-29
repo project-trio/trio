@@ -30,6 +30,66 @@ async function makeSession (socket, user, callback) {
 	callback({ token: session.id })
 }
 
+async function emailRegister (socket, data, callback) {
+	let { email, name, ccid, md5 } = data
+	email = email.trim()
+	const emailError = CommonValidator.email(email)
+	if (emailError) {
+		return callback({ error: emailError })
+	}
+	if (!name) {
+		return callback({ register: true })
+	}
+	name = name.trim()
+	const nameError = CommonValidator.name(name.split(' '))
+	if (nameError) {
+		return callback({ error: nameError })
+	}
+	let user
+	try {
+		user = await User.create(email, name, ccid, md5)
+		Activity.create(user, { action: 'create' })
+	} catch (error) {
+		return console.log(error)
+	}
+	await makeSession(socket, user, callback)
+}
+
+async function emailSignin (socket, user, email, callback) {
+	if (email && user.email_status) {
+		return callback({ error: 'Cannot deliver to this email address', emailStatus: user.email_status, cancel: false })
+	}
+	await makePasscode(user, callback)
+}
+
+async function passcodeSignin (socket, user, data, callback) {
+	if (!user) {
+		return callback({ error: 'Invalid email for passcode', cancel: true })
+	}
+	let error, erasePasscode = false
+	const passcodeAt = user.passcode_at
+	if (!passcodeAt || now() > passcodeAt + 4 * 60 * 60) {
+		error = 'Passcode expired'
+		erasePasscode = true
+	} else if (user.passcode_attempts >= 5) {
+		error = 'Too many incorrect passcode attempts'
+		erasePasscode = true
+	} else {
+		const passcode = data.passcode
+		const validationError = CommonValidator.passcode(passcode)
+		if (validationError) {
+			error = validationError
+		} else if (parseInt(passcode, 10) !== user.passcode) {
+			error = 'Incorrect passcode'
+		}
+	}
+	if (error) {
+		await User.incorrectPasscode(user, erasePasscode)
+		return callback({ error, cancel: erasePasscode })
+	}
+	await makeSession(socket, user, callback)
+}
+
 //PUBLIC
 
 module.exports = (socket) => {
@@ -80,64 +140,4 @@ module.exports = (socket) => {
 			callback({ name, ccid })
 		})
 	})
-}
-
-const emailRegister = async (socket, data, callback) => {
-	let { email, name, ccid, md5 } = data
-	email = email.trim()
-	const emailError = CommonValidator.email(email)
-	if (emailError) {
-		return callback({ error: emailError })
-	}
-	if (!name) {
-		return callback({ register: true })
-	}
-	name = name.trim()
-	const nameError = CommonValidator.name(name.split(' '))
-	if (nameError) {
-		return callback({ error: nameError })
-	}
-	let user
-	try {
-		user = await User.create(email, name, ccid, md5)
-		Activity.create(user, { action: 'create' })
-	} catch (error) {
-		return console.log(error)
-	}
-	await makeSession(socket, user, callback)
-}
-
-const emailSignin = async (socket, user, email, callback) => {
-	if (email && user.email_status) {
-		return callback({ error: 'Cannot deliver to this email address', emailStatus: user.email_status, cancel: false })
-	}
-	await makePasscode(user, callback)
-}
-
-const passcodeSignin = async (socket, user, data, callback) => {
-	if (!user) {
-		return callback({ error: 'Invalid email for passcode', cancel: true })
-	}
-	let error, erasePasscode = false
-	const passcodeAt = user.passcode_at
-	if (!passcodeAt || now() > passcodeAt + 4 * 60 * 60) {
-		error = 'Passcode expired'
-		erasePasscode = true
-	} else if (user.passcode_attempts >= 5) {
-		error = 'Too many incorrect passcode attempts'
-		erasePasscode = true
-	} else {
-		const passcode = data.passcode
-		const validationError = CommonValidator.passcode(passcode)
-		if (validationError) {
-			error = validationError
-		} else if (parseInt(passcode, 10) !== user.passcode) {
-			error = 'Incorrect passcode'
-		}
-	}
-	if (error) {
-		await User.incorrectPasscode(user, erasePasscode)
-		return callback({ error, cancel: erasePasscode })
-	}
-	await makeSession(socket, user, callback)
 }

@@ -9,7 +9,7 @@ module.exports = {
 
 		const randomValues = crypto.randomBytes(LENGTH)
 		const result = new Array(LENGTH)
-		for (let i = 0; i < LENGTH; i++) {
+		for (let i = 0; i < LENGTH; i += 1) {
 			result[i] = BASE_58[randomValues[i] % BASE_COUNT]
 		}
 		return result.join('')

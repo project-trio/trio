@@ -24,8 +24,8 @@
 		"socket.io": "^2.3.0"
 	},
 	"devDependencies": {
-		"@ky-is/eslint-config": "^1.7.0",
-		"@ky-is/vue-markdown-poi": "^0.2.1",
+		"@ky-is/eslint-config": "^1.8.2",
+		"@ky-is/vue-markdown-poi": "^1.0.1",
 		"@vue/babel-preset-app": "^4.1.2",
 		"@vue/cli-plugin-babel": "^4.1.2",
 		"@vue/cli-plugin-eslint": "^4.1.2",
