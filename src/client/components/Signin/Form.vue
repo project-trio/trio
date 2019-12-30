@@ -15,7 +15,7 @@
 				<label v-else-if="ccid"><input v-model="enableCC" type="checkbox"> CC user?</label>
 			</div>
 		</div>
-		<input v-else v-model="passcode" type="number" class="input-big" placeholder="123456" autocomplete="off">
+		<input v-else v-model="passcode" type="number" class="input-big" placeholder="1234" autocomplete="off">
 		<button type="submit" class="button-big">Submit</button>
 	</fieldset>
 	<p v-if="!email" class="text-sm text-secondary">Your email is used to authenticate your account, and is never shown publicly, spammed, or made available to third parties.</p>

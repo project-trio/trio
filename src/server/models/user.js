@@ -44,7 +44,7 @@ module.exports = {
 	// Passcode
 
 	makePasscode (user) {
-		const passcode = randomRange(100000, 999999)
+		const passcode = randomRange(1000, 9999)
 		return db.oneOrNone(`UPDATE users SET passcode = $2, passcode_at = CURRENT_TIMESTAMP, passcode_attempts = 0, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING passcode`, [ user.id, passcode ])
 	},
 

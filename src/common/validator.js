@@ -38,11 +38,11 @@ module.exports = {
 		if (isNaN(string)) {
 			return 'Passcode must be numeric'
 		}
-		if (string.length < 6) {
-			return 'Passcode too short, must be 6 digits'
+		if (string.length < 4) {
+			return 'Passcode too short, must be 4 digits'
 		}
-		if (string.length > 6) {
-			return 'Passcode too long, must be 6 digits'
+		if (string.length > 4) {
+			return 'Passcode too long, must be 4 digits'
 		}
 		return null
 	},

@@ -71,7 +71,7 @@ async function passcodeSignin (socket, user, data, callback) {
 	if (!passcodeAt || now() > passcodeAt + 4 * 60 * 60) {
 		error = 'Passcode expired'
 		erasePasscode = true
-	} else if (user.passcode_attempts >= 5) {
+	} else if (user.passcode_attempts >= 4) {
 		error = 'Too many incorrect passcode attempts'
 		erasePasscode = true
 	} else {
