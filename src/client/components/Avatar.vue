@@ -1,5 +1,5 @@
 <template>
-<div :style="{ 'background-image': `url(${avatarUrl})`, width: `${size}px`, height: `${size}px` }" class="avatar" />
+<div :style="{ 'background-image': `url(${avatarUrl})`, minWidth: `${size}px`, height: `${size}px` }" class="rounded-sm bg-cover bg-no-repeat" />
 </template>
 
 <script>
@@ -26,10 +26,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="stylus" scoped>
-.avatar
-	background-size cover
-	background-repeat no-repeat
-	border-radius 2px
-</style>

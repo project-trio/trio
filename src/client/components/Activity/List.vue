@@ -1,6 +1,6 @@
 <template>
 <div class="activity-list">
-	<div v-if="user" class="flex">
+	<div v-if="user" class="mb-2 flex">
 		<Avatar :size="48" :ccid="userFilter && userFilter.ccid" :md5="userFilter && userFilter.md5" />
 		<h1>{{ !userFilter ? '[ unknown ]' : userFilter.name }}</h1>
 	</div>
@@ -9,7 +9,7 @@
 		<p v-if="topicLink">Play now: <a :href="topicLink" target="_blank">{{ topicLink }}</a></p>
 	</div>
 	<CreateActivity />
-	<ul v-if="activities" class="unstyled">
+	<ul v-if="activities">
 		<li v-for="activity in activities" :key="activity.id">
 			<Activity :activity="activity" :asUser="userId" :asTopic="topicId" />
 		</li>
@@ -50,13 +50,17 @@ export default {
 		},
 
 		topicId () {
+			const topic = this.topic
+			if (!topic) {
+				return null
+			}
 			const topics = this.$store.state.topics
 			for (const id in topics) {
-				if (topics[id] === this.topic) {
+				if (topics[id] === topic) {
 					return parseInt(id, 10)
 				}
 			}
-			return console.log('UNKNOWN TOPICS')
+			return console.log('UNKNOWN TOPICS', topic)
 		},
 		topicLink () {
 			if (this.topic === 'TD') {
@@ -87,6 +91,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="stylus" scoped>
-</style>

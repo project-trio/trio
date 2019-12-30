@@ -1,10 +1,10 @@
 <template>
-<div class="activity-item pre flex flex-top show-hover">
-	<Avatar :size="16" :ccid="user.ccid" :md5="user.md5" />
-	<div class="flex-fill">
-		<div class="flex flex-top">
-			<router-link :to="{ name: 'User', params: { name: fromName } }" class="activity-user flex">{{ fromName }}</router-link>
-			<span v-if="action" class="flex-fill">
+<div class="py-4 whitespace-pre  flex items-start group">
+	<Avatar :size="20" :ccid="user.ccid" :md5="user.md5" class="mt-1 mr-1" />
+	<div class="flex-grow">
+		<div class="flex items-start">
+			<router-link :to="{ name: 'User', params: { name: fromName } }" class="flex">{{ fromName }}</router-link>
+			<span v-if="action" class="flex-grow">
 				<span v-if="action === 'create'">
 					joined {{ new Date(activity.created_at * 1000).toLocaleDateString() }}!
 				</span>
@@ -15,30 +15,32 @@
 				</span>
 			</span>
 			<span v-else>
-				<span v-if="headingName" class="text-faint">
+				<span v-if="headingName" class="text-secondary">
 					{{ targetAsUser ? 'to' : 'in' }}
 					<span v-if="targetAsUser && headingName === fromName">self</span>
 					<router-link v-else :to="{ name: targetRoute, params: { name: headingName } }">{{ headingName }}</router-link>:
 					</span>
 					<span v-else>: </span>
-				<MarkdownPoi :raw="activity.body" :tag="headingName ? 'div' : 'span'" :inline="!headingName"/>
+				<MarkdownPoi :raw="activity.body" :tag="headingName ? 'div' : 'span'" :inline="!headingName" class="whitespace-pre-wrap" />
 			</span>
 		</div>
-		<div class="activity-actions flex">
-			<div class="flex">
+		<div class="mt-px  flex justify-between">
+			<div class="mr-1  flex">
 				<div v-for="reaction in activity.r_emoji" :key="reaction">{{ reaction }}</div>
-				<button class="show-hovered" @click="onShow('react')">{{ show === 'react' ? '⚉' : '⚇' }}</button>
-				<button class="show-hovered borderless" @click="onShow('reply')">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
+				<span class="invisible group-hover:visible">
+					<button class="activity-button  text-lg leading-none" @click="onShow('react')">{{ show === 'react' ? '⚉' : '⚇' }}</button>
+					<button class="activity-button  text-sm" @click="onShow('reply')">{{ show === 'reply' ? 'Cancel' : 'Reply' }}</button>
+				</span>
 			</div>
-			<RelativeTime :at="activity.created_at" class="show-hovered text-small text-faint" />
+			<RelativeTime :at="activity.created_at" class="text-sm text-secondary" />
 		</div>
-		<div v-if="show === 'reply'">
-			<textarea v-model="replyMessage" class="big" placeholder="4–280 characters" />
-			<button class="big" @click="onReply">Send</button>
+		<div v-if="show === 'reply'" class="mt-1">
+			<textarea v-model="replyMessage" placeholder="4–280 characters" class="textarea-big" /> <!-- TODO v-focus -->
+			<button class="button-big" @click="onReply">Send</button>
 		</div>
-		<div v-else-if="show === 'react'" class="popover show-hovered">
+		<div v-else-if="show === 'react'" class="invisible group-hover:visible absolute bg-white pt-1 rounded shadow">
 			<div v-for="(emojiRow, idx) in $options.reactionEmoji" :key="idx">
-				<button v-for="emoji in emojiRow" :key="emoji" @click="onEmoji(emoji)">{{ emoji }}</button>
+				<button v-for="emoji in emojiRow" :key="emoji" class="px-1 pb-1" @click="onEmoji(emoji)">{{ emoji }}</button>
 			</div>
 		</div>
 	</div>
@@ -147,45 +149,11 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
-.activity-item
-	padding 16px 0
-
-.pre
-	white-space pre
-
-.flex-top
-	align-items flex-start
-
-.avatar
-	margin-right 2px
-	flex-shrink 0
-
-.activity-actions
-	margin-top 2px
-	justify-content space-between
-	& > *
-		margin-right 4px
-	& button
-		height 24px
-		background none
-		border 1px solid #d
-		border-radius 4px
-
-.flex-fill
-	flex-grow 1
-
-.popover
-	position absolute
-	background #f
-	box-shadow 0 1.5px 2px #a
-	border-radius 2px
-	padding-top 4px
-	& button
-		border none
-		background none
-		font-size 24px
-
-.markdown-poi
-	margin -12px 0
+<style lang="postcss" scoped>
+.activity-button {
+	@apply h-6 min-w-6 mr-1 px-1 border rounded bg-transparent align-top;
+	&:hover {
+		@apply bg-brand-100 border-transparent text-brand-700;
+	}
+}
 </style>

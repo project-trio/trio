@@ -1,5 +1,5 @@
 <template>
-<div class="home">
+<div>
 	<ActivityList :user="user" :topic="topic" />
 </div>
 </template>

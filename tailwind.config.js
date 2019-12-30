@@ -1,6 +1,8 @@
 module.exports = {
 	theme: {
 		colors: require('@ky-is/tailwind-color-palette')('#f83', {ui: true, grayscale: true}),
+		minWidth: theme => theme('width'),
+		minHeight: theme => theme('height'),
 		extend: {
 			inset: {
 				full: '100%',
@@ -8,8 +10,7 @@ module.exports = {
 			width: {
 				96: '24rem',
 			},
-			minWidth: theme => theme('width'),
-			minHeight: theme => theme('height'),
+			maxHeight: theme => theme('height'),
 		},
 	},
 	variants: {

@@ -1,6 +1,6 @@
 <template>
-<div class="home">
-	<h1 class="text-center">welcome!</h1>
+<div>
+	<h1 class="text-center text-4xl">Welcome!</h1>
 	<SigninForm />
 </div>
 </template>

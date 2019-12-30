@@ -1,8 +1,8 @@
 <template>
 <form @submit.prevent="onSubmit">
 	<fieldset :disabled="submitting">
-		<textarea v-model="message" :placeholder="messagePlaceholder" class="big" />
-		<button v-if="message" type="submit" class="big">Submit</button>
+		<textarea v-model="message" :placeholder="messagePlaceholder" class="textarea-big" />
+		<button v-if="message" type="submit" class="button-big">Submit</button>
 	</fieldset>
 </form>
 </template>
@@ -69,10 +69,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="stylus" scoped>
-.multiselect
-	width 50%
-	max-width 160px
-	display inline-block
-</style>

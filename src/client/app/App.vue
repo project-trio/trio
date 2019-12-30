@@ -1,8 +1,8 @@
 <template>
 <div id="app">
 	<NavBar v-if="hasSignin" />
-	<div v-if="reconnectAttempts !== null" class="overlay">
-		<h1 class="text-center">{{ reconnectAttempts }} attempts to reconnect</h1>
+	<div v-if="reconnectAttempts !== null" class="fixed inset-0 bg-white opacity-75  pointer-events-none  flex justify-center items-center ">
+		<h1 class="text-center text-3xl font-black text-danger-500">{{ reconnectAttempts }} attempts to reconnect</h1>
 	</div>
 	<div class="container">
 		<router-view class="content" />
@@ -68,144 +68,55 @@ export default {
 }
 </script>
 
-<style lang="stylus">
-body
-	margin 0
+<style lang="postcss">
+@import '../assets/styles/tailwind.postcss';
 
-#app
-	font-family -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif
-	-webkit-font-smoothing antialiased
-	-moz-osx-font-smoothing grayscale
-	color #2
+#app {
+	@apply text-gray-900;
+}
 
-a
-	color #f83
-	text-decoration none
-	transition color 300ms ease-out
-	&:hover
-		color #fa6
-		&:active
-			color #fc8
+a, button {
+	transition-duration: 300ms;
+}
+button {
+	transition-property: color background;
+}
+a {
+	transition-property: color;
+	@apply no-underline;
+	&:not(.router-link-exact-active) {
+		@apply text-brand-500;
+		&:hover {
+			@apply text-brand-600;
+			&:active {
+				@apply text-brand-400;
+			}
+		}
+	}
+}
+.router-link-exact-active {
+	@apply cursor-default;
+}
 
-.router-link-exact-active
-	color inherit !important
-	cursor default
+.container {
+	@apply max-w-xl m-auto px-2;
+}
 
-//PAGE
+.text-secondary {
+	@apply text-gray-600;
+}
 
-.container
-	width 512px
-	max-width 100%
-	margin auto
-	box-sizing border-box
-	padding 8px
+/* INPUT */
 
-.content
-	width 100%
+.button-big {
+	@apply block mx-auto my-2 w-48 h-12 rounded-lg text-white text-2xl font-medium bg-brand-400;
+}
 
-.overlay
-	position fixed
-	top 0
-	left 0
-	right 0
-	bottom 0
-	z-index 9001
-	background rgba(#f, 0.5)
-	color #e33
+.input-big {
+	@apply block mx-auto my-2 w-96 max-w-full h-12 border rounded-lg text-xl font-light text-center;
+}
 
-//LAYOUT
-
-.flex
-	display flex
-	align-items center
-
-.inline
-	display inline-block
-
-.text-center
-	text-align center
-
-.text-small
-	font-size 0.8em
-
-.text-faint
-	color #9
-
-ul
-	list-style initial
-	padding-left 30px
-	&.unstyled
-		padding 0
-		list-style none
-
-p + ul
-	margin-top -12px
-
-.show-hover .show-hovered
-	visibility hidden
-.show-hover:hover .show-hovered
-	visibility visible
-
-//CONTROLS
-
-fieldset
-	border none
-	margin 0
-	padding 0
-	width 100%
-	max-width 100%
-	box-sizing border-box
-
-button, textarea, input
-	outline none
-	box-sizing border-box
-
-.big
-	display block
-	margin 8px auto !important
-	max-width 100%
-
-input.big
-	width 320px
-	height 44px
-	font-size 24px
-	border 1px solid #d
-	border-radius 3px
-	text-align center
-
-textarea.big
-	width 100%
-	resize vertical
-	min-height 48px
-	max-height 160px
-	border 1px solid #e8
-	border-radius 5px
-	text-align left
-	font-size inherit
-	padding 3px 6px
-
-.interactive, button
-	transition-property background, color, opacity
-	transition-duration 350ms
-	transition-timing-function ease-out
-
-fieldset:disabled *
-	cursor not-allowed !important
-	opacity 0.5 !important
-
-button
-	cursor pointer
-	&:hover
-		opacity 0.7
-		&:active
-			opacity 0.4
-
-button.big
-	width 256px
-	box-sizing border-box
-	height 44px
-	font-size 24px
-	background #e8
-	border-radius 3px
-	border none
+.textarea-big {
+	@apply block w-full min-h-8 max-h-48 px-2 py-px border rounded-lg;
+}
 </style>

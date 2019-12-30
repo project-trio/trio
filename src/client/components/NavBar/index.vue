@@ -1,10 +1,10 @@
 <template>
 <nav>
-	<div class="container flex text-faint">
-		<router-link :to="{ name: 'Home' }" class="brand">Trio</router-link>
-		<router-link v-if="name" :to="{ name: 'User', params: { name } }" class="user-box flex">
-			<span class="text-small">{{ name }}</span>
-			<Avatar :size="24" :ccid="ccid" :md5="md5" class="inline" />
+	<div class="container  h-10 text-secondary  flex justify-between items-center">
+		<router-link :to="{ name: 'Home' }" class="text-xl font-black tracking-wide">Trio</router-link>
+		<router-link v-if="name" :to="{ name: 'User', params: { name } }" class="flex items-center">
+			<span class="text-sm">{{ name }}</span>
+			<Avatar :size="24" :ccid="ccid" :md5="md5" class="ml-1" />
 		</router-link>
 	</div>
 </nav>
@@ -33,24 +33,3 @@ export default {
 	},
 }
 </script>
-
-<style lang="stylus" scoped>
-nav
-	height 32px
-	font-size 20px
-
-.container
-	padding 0 8px
-	height inherit
-	justify-content space-between
-
-.user-box
-	height inherit
-
-.brand
-	font-weight 900
-	letter-spacing 0.7px
-
-.avatar
-	margin-left 4px
-</style>
