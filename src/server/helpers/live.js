@@ -161,8 +161,7 @@ module.exports = {
 	connectUser (socket, privateUser, game) {
 		const userId = privateUser.id
 		const existingUser = users[userId]
-		let user
-		let updateUser
+		let user, updateUser
 		if (existingUser) {
 			if (game && existingUser.gameName) {
 				return false

@@ -1,3 +1,4 @@
+import TrioClient from '@ky-is/trio-client'
 import Vue from 'vue'
 
 import App from './App.vue'
@@ -33,15 +34,4 @@ new Vue({
 	render: h => h(App),
 }).$mount('#app')
 
-function isEmpty (obj) {
-	for (const _ in obj) {
-		return false
-	}
-	return true
-}
-
-// SETUP
-
-if (!isEmpty(router.currentRoute.query)) {
-	router.replace({ query: null })
-}
+TrioClient.init(router)

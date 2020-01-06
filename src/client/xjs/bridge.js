@@ -1,34 +1,15 @@
-import io from 'socket.io-client'
+import TrioClient from '@ky-is/trio-client'
 
 import store from '@/client/vue/store'
 
 import storage from '@/client/xjs/storage'
 
-const query = {}
-const token = storage.get('token')
-if (token) {
-	query.token = token
-}
-
-const socket = io('/trio', { query })
-
-socket.on('disconnect', () => {
-	console.log('disconnected')
-	store.commit('RECONNECT', 0)
-})
-socket.on('reconnecting', (attemptNumber) => {
-	store.commit('RECONNECT', attemptNumber)
-})
-socket.on('reconnect', () => {
-	store.commit('RECONNECT', null)
-})
-
-socket.on('local', (user) => {
+const socket = TrioClient.connectTo('trio', store.state.sessionToken, (token) => {
+}, (user) => {
 	store.commit('LOCAL_USER', user)
-})
-
-socket.on('error', (error) => {
-	window.alert(error)
+}, (reconnectAttempts) => {
+	store.commit('RECONNECT', reconnectAttempts)
+}, (error) => {
 	storage.clear()
 	window.location.reload(true)
 })
