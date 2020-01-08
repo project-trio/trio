@@ -13,7 +13,7 @@ const auth = async (socket, next) => {
 	const namespace = socket.nsp.name
 	const isGame = namespace !== '/trio'
 	const game = isGame ? namespace : null
-	if (sessionToken) {
+	if (sessionToken && sessionToken.length === 36) {
 		try {
 			const session = await Session.update(sessionToken)
 			if (!session) {
@@ -44,7 +44,7 @@ module.exports = {
 		const namespace = io.of(`/${name}`)
 		namespace.use(auth)
 		namespace.on('connection', (socket) => {
-			callback(namespace, socket)
+			callback(socket)
 
 			socket.on('disconnect', () => {
 				const user = socket.user

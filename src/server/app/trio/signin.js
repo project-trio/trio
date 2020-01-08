@@ -19,7 +19,7 @@ async function makePasscode (user, callback) {
 	const passcodeCreation = await User.makePasscode(user)
 	mailer.passcode(email, passcodeCreation.passcode, () => {
 		callback({ userID: user.id })
-	}, _error => {
+	}, (error) => {
 		callback({ error: 'Invalid email', cancel: true })
 	})
 }

@@ -16,6 +16,12 @@ export default new Router({
 			name: 'Home',
 			component: Home,
 		},
+
+		{
+			path: '/signin',
+			name: 'Signin',
+			component: Signin,
+		},
 		{
 			path: '/passcode/:email/:passcode',
 			name: 'Passcode',
@@ -47,12 +53,6 @@ export default new Router({
 					topic: route.params.name,
 				}
 			},
-		},
-
-		{
-			path: '/signin',
-			name: 'Signin',
-			component: Signin,
 		},
 	],
 })

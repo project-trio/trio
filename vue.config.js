@@ -15,6 +15,7 @@ module.exports = {
 
 	pages: {
 		index: { entry: 'src/client/app/main.js' },
+		admin: { entry: 'src/client/admin/main.js' },
 	},
 
 	chainWebpack (config) {

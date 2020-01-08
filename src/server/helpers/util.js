@@ -33,4 +33,8 @@ module.exports = {
 		return `${minutes}:${seconds}`
 	},
 
+	code () {
+		return Math.floor(Math.random() * 900000) + 100000
+	},
+
 }

@@ -10,7 +10,6 @@ const QUEUE_WAIT = TESTING ? 6 : 20
 
 const queuingSockets = []
 
-let ioTD = null
 let queueReadyTimer = null
 
 const readySockets = () => {
@@ -31,58 +30,56 @@ const leaveQueue = (socket) => {
 	}
 }
 
-const popQueue = () => {
-	queueReadyTimer = null
-	const sockets = readySockets()
-	if (sockets.length < 2) {
-		return console.log('Queue not ready when popped')
-	}
-	let modeVotes = []
-	for (const socket of sockets) {
-		if (MODES.includes(socket.queue.mode)) {
-			modeVotes.push(socket.queue.mode)
-		}
-	}
-	if (!modeVotes.length) {
-		modeVotes = MODES
-	}
-	const mode = randomItem(modeVotes)
-	const game = new Game(ioTD, mode, sockets.length)
-	for (const socket of sockets) {
-		leaveQueue(socket)
-		game.add(socket)
-	}
-}
-
-const queueToggle = (io, socket, queuing) => {
-	if (!queuing && !socket.queue) {
-		return
-	}
-	if (queueReadyTimer) {
-		clearTimeout(queueReadyTimer)
-		queueReadyTimer = null
-	}
-	socket.queue.in = queuing
-	const name = socket.user.name
-	if (queuing) {
-		socket.join('queue')
-		if (!queuingSockets.includes(socket)) {
-			queuingSockets.push(socket)
-		} else {
-			console.log('Socket already in queue', name)
-		}
-	} else {
-		leaveQueue(socket)
-	}
-	io.in('lobby').emit('queued', [ name, queuing ])
-
-	if (queuingSockets.length >= 2) {
-		queueReadyTimer = setTimeout(popQueue, QUEUE_WAIT * 1000)
-	}
-}
-
 module.exports = (io, socket) => {
-	ioTD = io
+	const popQueue = () => {
+		queueReadyTimer = null
+		const sockets = readySockets()
+		if (sockets.length < 2) {
+			return console.log('Queue not ready when popped')
+		}
+		let modeVotes = []
+		for (const socket of sockets) {
+			if (MODES.includes(socket.queue.mode)) {
+				modeVotes.push(socket.queue.mode)
+			}
+		}
+		if (!modeVotes.length) {
+			modeVotes = MODES
+		}
+		const mode = randomItem(modeVotes)
+		const game = new Game(io, mode, sockets.length)
+		for (const socket of sockets) {
+			leaveQueue(socket)
+			game.add(socket)
+		}
+	}
+
+	const queueToggle = (io, socket, queuing) => {
+		if (!queuing && !socket.queue) {
+			return
+		}
+		if (queueReadyTimer) {
+			clearTimeout(queueReadyTimer)
+			queueReadyTimer = null
+		}
+		socket.queue.in = queuing
+		const name = socket.user.name
+		if (queuing) {
+			socket.join('queue')
+			if (!queuingSockets.includes(socket)) {
+				queuingSockets.push(socket)
+			} else {
+				console.log('Socket already in queue', name)
+			}
+		} else {
+			leaveQueue(socket)
+		}
+		io.in('lobby').emit('queued', [ name, queuing ])
+
+		if (queuingSockets.length >= 2) {
+			queueReadyTimer = setTimeout(popQueue, QUEUE_WAIT * 1000)
+		}
+	}
 
 	socket.on('lobby', (lobbying, callback) => {
 		if (lobbying) {
@@ -91,7 +88,7 @@ module.exports = (io, socket) => {
 			socket.leave('lobby')
 		}
 		if (callback) {
-			const gameData = live.getGame(2)
+			const gameData = live.getGameStats(2)
 			gameData.names = queuingSockets.map(socket => socket.user.name)
 			callback(gameData)
 		}

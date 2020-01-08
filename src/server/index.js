@@ -18,8 +18,7 @@ const io = require('socket.io')(server)
 
 require('./app/trio')(io)
 require('./app/td')(io)
-
-//HYDRATE
+require('./app/moba')(io)
 
 require.main.require('./helpers/live').init(io)
 
@@ -27,7 +26,7 @@ require.main.require('./helpers/live').init(io)
 
 app.use(express.static('~$dist'))
 
-app.get('*', (request, response, _next) => {
+app.get('*', (request, response, next) => {
 	response.sendFile(path.resolve(__dirname, '../../~$dist/index.html'))
 })
 

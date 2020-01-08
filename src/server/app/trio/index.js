@@ -1,13 +1,21 @@
+const { TESTING } = require.main.require('../common/constants')
+
 const middleware = require.main.require('./helpers/middleware')
 
 const home = require('./home')
 const signin = require('./signin')
 
 module.exports = (io) => {
-	return middleware.namespace(io, 'trio', (trio, socket) => {
+	const trio = middleware.namespace(io, 'trio', (socket) => {
 		if (!socket.user) {
 			signin(socket)
+		} else if (TESTING || socket.user.admin) {
+			trio.on('admin', (data, callback) => {
+				callback({}) //TODO
+			})
 		}
 		home(socket)
 	})
+
+	return trio
 }
