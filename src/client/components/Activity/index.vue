@@ -10,7 +10,7 @@
 				</span>
 				<span v-else-if="action === 'highscore'">
 					highscored
-					<router-link :to="{ name: 'Topic', params: { name: targetTopic } }">{{ targetTopic }}</router-link>
+					<router-link :to="{ name: 'Topic', params: { name: targetTopic } }"><TopicIcon v-if="topicData" :topic="topicData" class="inline wh-6 rounded-sm" />{{ targetTopic }}</router-link>
 					{{ highscoreDescription }}!
 				</span>
 			</span>
@@ -50,10 +50,11 @@
 <script>
 import MarkdownPoi from '@ky-is/vue-markdown-poi'
 
-import { REACTION_EMOJI } from '@/common/constants'
+import { REACTION_EMOJI, TOPIC_DATA } from '@/common/constants'
 
 import Avatar from '@/client/components/Avatar'
 import RelativeTime from '@/client/components/RelativeTime'
+import TopicIcon from '@/client/components/Topic/Icon'
 
 import bridge from '@/client/xjs/bridge'
 
@@ -62,6 +63,7 @@ export default {
 		Avatar,
 		MarkdownPoi,
 		RelativeTime,
+		TopicIcon,
 	},
 
 	reactionEmoji: REACTION_EMOJI,
@@ -105,6 +107,10 @@ export default {
 				}
 			}
 			return null
+		},
+
+		topicData () {
+			return TOPIC_DATA[this.targetTopic]
 		},
 
 		targetUser () {

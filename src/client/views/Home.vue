@@ -1,6 +1,6 @@
 <template>
 <div>
-	<ActivityList :user="user" :topic="topic" />
+	<ActivityList :user="user" :topicName="topicName" />
 </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
 
 	props: {
 		user: String,
-		topic: String,
+		topicName: String,
 	},
 
 	beforeCreate () {

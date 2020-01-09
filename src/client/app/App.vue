@@ -1,6 +1,9 @@
 <template>
 <div id="app">
-	<NavBar v-if="hasSignin" />
+	<template v-if="hasSignin">
+		<NavBar />
+		<GameBar v-if="$route.name === 'Home'" />
+	</template>
 	<div v-if="reconnectAttempts !== null" class="fixed inset-0 bg-white opacity-75  pointer-events-none  flex justify-center items-center ">
 		<h1 class="text-center text-3xl font-black text-danger-500">{{ reconnectAttempts }} attempts to reconnect</h1>
 	</div>
@@ -12,9 +15,11 @@
 
 <script>
 import NavBar from '@/client/components/NavBar'
+import GameBar from '@/client/components/NavBar/Game'
 
 export default {
 	components: {
+		GameBar,
 		NavBar,
 	},
 

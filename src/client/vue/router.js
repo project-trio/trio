@@ -50,7 +50,7 @@ export default new Router({
 			component: Home,
 			props (route) {
 				return {
-					topic: route.params.name,
+					topicName: route.params.name,
 				}
 			},
 		},

@@ -1,12 +1,16 @@
 <template>
 <div class="activity-list">
-	<div v-if="user" class="mb-2 flex">
-		<Avatar :size="48" :ccid="userFilter && userFilter.ccid" :md5="userFilter && userFilter.md5" />
-		<h1>{{ !userFilter ? '[ unknown ]' : userFilter.name }}</h1>
-	</div>
-	<div v-else-if="topic">
-		<h1>{{ topic }}</h1>
-		<p v-if="topicLink">Play now: <a :href="topicLink" target="_blank">{{ topicLink }}</a></p>
+	<div class="mb-2">
+		<div v-if="user" class="flex">
+			<Avatar :size="48" :ccid="userFilter && userFilter.ccid" :md5="userFilter && userFilter.md5" />
+			<h1 class="ml-1 text-xl">{{ !userFilter ? '[ unknown ]' : userFilter.name }}</h1>
+		</div>
+		<template v-else-if="topicName">
+			<TopicHero v-if="topic" :topic="topic" />
+			<div v-else>
+				<h1>{{ topicName }}</h1>
+			</div>
+		</template>
 	</div>
 	<CreateActivity />
 	<ul v-if="activities">
@@ -18,20 +22,24 @@
 </template>
 
 <script>
+import { TOPIC_DATA } from '@/common/constants'
+
 import Activity from '@/client/components/Activity'
 import CreateActivity from '@/client/components/CreateActivity'
 import Avatar from '@/client/components/Avatar'
+import TopicHero from '@/client/components/Topic/Hero'
 
 export default {
 	components: {
 		Activity,
 		Avatar,
 		CreateActivity,
+		TopicHero,
 	},
 
 	props: {
 		user: String,
-		topic: String,
+		topicName: String,
 	},
 
 	computed: {
@@ -49,32 +57,36 @@ export default {
 			return this.user && this.userFilter && this.userFilter.id
 		},
 
+		topic () {
+			return TOPIC_DATA[this.topicName]
+		},
+
 		topicId () {
-			const topic = this.topic
-			if (!topic) {
+			const topicName = this.topicName
+			if (!topicName) {
 				return null
 			}
 			const topics = this.$store.state.topics
 			for (const id in topics) {
-				if (topics[id] === topic) {
+				if (topics[id] === topicName) {
 					return parseInt(id, 10)
 				}
 			}
-			return console.log('UNKNOWN TOPICS', topic)
+			return console.log('UNKNOWN TOPIC', topicName)
 		},
 		topicLink () {
-			if (this.topic === 'TD') {
+			if (this.topicName === 'TD') {
 				return 'https://ttd.netlify.com'
 			}
-			if (this.topic === 'Moba') {
-				return 'https://moba.suzu.online'
+			if (this.topicName === 'Moba') {
+				return 'https://moba.netlify.com'
 			}
-			return console.log('UNKNOWN TOPIC', this.topic)
+			return console.log('UNKNOWN TOPIC', this.topicName)
 		},
 
 		activities () {
 			const filterUserId = this.user && this.userId
-			const filterTopicId = this.topic && this.topicId
+			const filterTopicId = this.topicName && this.topicId
 			const filterId = filterUserId || filterTopicId
 			const filterType = filterUserId ? 'user' : 'topic'
 			const activities = this.$store.state.activities
