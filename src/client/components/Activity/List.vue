@@ -2,8 +2,8 @@
 <div class="activity-list">
 	<div class="mb-2">
 		<div v-if="user" class="flex">
-			<Avatar :size="48" :ccid="userFilter && userFilter.ccid" :md5="userFilter && userFilter.md5" />
-			<h1 class="ml-1 text-xl">{{ !userFilter ? '[ unknown ]' : userFilter.name }}</h1>
+			<Avatar :size="48" :ccid="currentUser && currentUser.ccid" :md5="currentUser && currentUser.md5" />
+			<h1 class="ml-1 text-xl">{{ !currentUser ? '[ unknown ]' : currentUser.name }}</h1>
 		</div>
 		<template v-else-if="topicName">
 			<TopicHero v-if="topic" :topic="topic" />
@@ -43,7 +43,7 @@ export default {
 	},
 
 	computed: {
-		userFilter () {
+		currentUser () {
 			const users = this.$store.state.users
 			for (const id in users) {
 				const user = users[id]
@@ -51,10 +51,10 @@ export default {
 					return user
 				}
 			}
-			return console.log('UNKNOWN USER')
+			return null
 		},
 		userId () {
-			return this.user && this.userFilter && this.userFilter.id
+			return this.user && this.currentUser && this.currentUser.id
 		},
 
 		topic () {
@@ -72,7 +72,7 @@ export default {
 					return parseInt(id, 10)
 				}
 			}
-			return console.log('UNKNOWN TOPIC', topicName)
+			return null
 		},
 		topicLink () {
 			if (this.topicName === 'TD') {

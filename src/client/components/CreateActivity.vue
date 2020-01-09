@@ -27,7 +27,7 @@ export default {
 			const name = this.targetName
 			if (name) {
 				if (this.$route.name === 'User') {
-					const isLocal = name.toLowerCase() === this.$store.state.local.name.toLowerCase()
+					const isLocal = this.$store.state.local.name && name.toLowerCase() === this.$store.state.local.name.toLowerCase()
 					return `Message to ${isLocal ? 'yourself' : name}`
 				}
 				return `Message in ${name}`
