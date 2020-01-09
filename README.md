@@ -4,40 +4,36 @@ https://trio.suzu.online
 
 Multiplayer game server and realtime frontend with community features.
 
+## Games
+
+- [TD on GitHub](https://github.com/project-trio/td): Open-field Tower Defense
+- [Moba on GitHub](https://github.com/project-trio/moba): Top-down strategy MOBA
+
 ## Tech
 
 - Client: [Vue.js](https://vuejs.org)
 - WebSockets with [socket.io](https://socket.io)
 - Node.js/PostgreSQL backend
 
-## Games
-
-The source for the [TD](https://github.com/ky-is/td) game is available to run alongside. Or you modify it to create your own game!
-
 ## Development
 
-Install dependencies:
-```console
+Run postgres server, and create a database named `trio`.
+
+```sh
 cd trio
+
+# Install dependencies
 npm install
-```
 
-Run postgres server, and create a database named `trio`. Then import the structure file:
-```console
+# Import the DB structure
 psql trio < db.sql
-```
 
-Start the server:
-```console
+# Start the server
 npm start
-```
 
-Hot-reload client:
-```console
+# Hot-reload dev environment
 npm run serve
-```
 
-Production build:
-```console
+# Production build
 npm run build
 ```
