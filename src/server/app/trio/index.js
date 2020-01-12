@@ -10,7 +10,7 @@ module.exports = (io) => {
 		if (!socket.user) {
 			signin(socket)
 		} else if (TESTING || socket.user.admin) {
-			trio.on('admin', (data, callback) => {
+			socket.on('admin', (data, callback) => {
 				callback({}) //TODO
 			})
 		}
