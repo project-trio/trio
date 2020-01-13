@@ -158,12 +158,12 @@ module.exports = {
 
 	// User
 
-	connectUser (socket, privateUser, game) {
+	connectUser (socket, privateUser, gameName) {
 		const userId = privateUser.id
 		const existingUser = users[userId]
 		let user, updateUser
 		if (existingUser) {
-			if (game && existingUser.gameName) {
+			if (gameName && existingUser.gameName) {
 				return false
 			}
 			existingUser.at = privateUser.at
@@ -193,8 +193,8 @@ module.exports = {
 			updateUser = user
 		}
 		socket.user = user
-		if (game) {
-			user.gameName = game
+		if (gameName) {
+			user.gameName = gameName
 		}
 		socket.emit('local', { id: user.id, name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
 		trio.in('home').emit('update action', { user: updateUser })

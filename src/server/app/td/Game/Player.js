@@ -4,8 +4,8 @@ module.exports = class Player {
 		this.socket = socket
 		this.user = user
 
-		this.joined = true
-		this.ready = false
+		this.isJoined = true
+		this.isReadyToStart = false
 		this.finished = false
 		this.serverUpdate = null
 

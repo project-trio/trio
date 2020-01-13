@@ -10,7 +10,7 @@ let loopCount = 0
 
 const loop = function () {
 	for (const game of Game.all) {
-		if (!game.playing) {
+		if (!game.broadcastsPlaying) {
 			continue
 		}
 		const states = []
@@ -59,9 +59,9 @@ const loop = function () {
 		}
 
 		const actions = [ wave, winners.length ? winners : null ]
-		const isFinished = game.state === 'finished'
+		const isFinished = game.isFinished()
 		if (isFinished) {
-			game.playing = false
+			game.broadcastsPlaying = false
 		}
 		game.broadcast('server update', { update: currentUpdate, actions, states, finished: isFinished ? game.duration : undefined })
 		game.serverUpdate = currentUpdate + 1

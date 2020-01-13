@@ -22,7 +22,7 @@ class Game {
 		this.players = []
 		this.io = io.to(this.id)
 		this.state = 'open'
-		this.playing = false
+		this.broadcastsPlaying = false
 		this.serverUpdate = 0
 		this.idleCount = 0
 		this.singleplayer = playerCount <= 1
@@ -66,14 +66,27 @@ class Game {
 		return this.players.length
 	}
 
-	activePlayerCount () {
-		let result = 0
+	hasJoinedPlayer () {
 		for (const player of this.players) {
-			if (player.joined) {
-				result += 1
+			if (player.isJoined) {
+				return true
 			}
 		}
-		return result
+		return false
+	}
+
+	//STATE
+
+	isStarted () {
+		return this.state !== 'open'
+	}
+
+	isFinished () {
+		return this.state === 'finished'
+	}
+
+	isPlaying () {
+		return this.isStarted() && !this.isFinished()
 	}
 
 	//JOIN
@@ -90,18 +103,18 @@ class Game {
 	}
 
 	async ready (socket) {
-		if (this.playing || !socket.player) {
+		if (!socket.player || this.isStarted()) {
 			return
 		}
 		console.log(new Date().toLocaleTimeString(), this.id, 'TD started', this.players.length)
-		socket.player.ready = true
+		socket.player.isReadyToStart = true
 		for (const player of this.players) {
-			if (!player.ready) {
+			if (!player.isReadyToStart) {
 				return
 			}
 		}
 		this.state = 'started'
-		this.playing = true
+		this.broadcastsPlaying = true
 		this.waveNumber = 1
 		this.startTime = new Date()
 		this.broadcast('start game', {
@@ -121,7 +134,7 @@ class Game {
 		let data
 		let player = this.playerById(pid)
 		if (player) {
-			player.joined = true
+			player.isJoined = true
 			socket.player = player
 			this.broadcast('update player', { pid, joined: true })
 			data = {
@@ -134,7 +147,7 @@ class Game {
 			}
 			console.log('Rejoin game', this.id, user.id)
 		} else {
-			if (this.playing) {
+			if (this.isStarted()) {
 				return socket.emit('joined game', { error: `Already playing ${this.id}` })
 			}
 			player = new Player(socket, user)
@@ -153,7 +166,7 @@ class Game {
 	hasMultipleActivePlayers () {
 		let remainingActivePlayerCount = 0
 		for (const player of this.players) {
-			if (player.joined && !player.finished && !player.didLose()) {
+			if (player.isJoined && !player.finished && !player.didLose()) {
 				if (remainingActivePlayerCount > 0) {
 					return true
 				}
@@ -179,8 +192,8 @@ class Game {
 	}
 
 	async finish () {
-		if (this.state === 'finished') {
-			return console.log('Game already finished')
+		if (this.isFinished()) {
+			return console.log('ERR', this.id, 'Game already finished')
 		}
 		console.log(new Date().toLocaleTimeString(), this.id, 'TD finished')
 		this.state = 'finished'
@@ -233,19 +246,19 @@ class Game {
 		const pid = socket.user.id
 		const leaveIndex = this.playerIndexOf(pid)
 		if (leaveIndex !== null) {
-			if (this.playing) {
+			if (this.isStarted()) {
 				const player = this.players[leaveIndex]
-				player.joined = false
+				player.isJoined = false
 			} else {
 				this.players.splice(leaveIndex, 1)
+				socket.game = null
+				socket.player = null
 			}
 
-			if (this.activePlayerCount() <= 0) {
+			if (!this.hasJoinedPlayer()) {
 				this.destroy()
 				return true
 			}
-			socket.game = null
-			socket.player = null
 			this.broadcast('update player', { pid, joined: false })
 		}
 	}
