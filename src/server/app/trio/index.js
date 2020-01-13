@@ -16,6 +16,5 @@ module.exports = (io) => {
 		}
 		home(socket)
 	})
-
 	return trio
 }

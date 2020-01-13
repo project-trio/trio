@@ -205,7 +205,6 @@ module.exports = {
 		const user = socket.user
 		user.online -= 1
 		if (user.online === 0) {
-			delete users[user.id]
 			trio.in('home').emit('update action', { user })
 		}
 	},
