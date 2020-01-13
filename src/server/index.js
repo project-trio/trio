@@ -14,7 +14,7 @@ const server = require('http').createServer(app)
 
 //SOCKET.IO
 
-const io = require('socket.io')(server)
+const io = require('socket.io')(server, { cookie: false })
 
 require('./app/trio')(io)
 require('./app/td')(io)
