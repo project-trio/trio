@@ -133,6 +133,9 @@ class Game {
 			if (this.state !== 'OPEN') {
 				return { error: `Unable to join: ${this.state} game` }
 			}
+			if (this.checkFull()) {
+				return { error: 'Game full' }
+			}
 			if (!this.hostId) {
 				this.hostId = pid
 			}
@@ -140,9 +143,6 @@ class Game {
 			this.team(player, teamCounts[0] <= teamCounts[1] ? 0 : 1)
 			player.setRetro(this.retro, this.tutorialMode)
 
-			if (this.checkFull()) {
-				this.state = 'FULL'
-			}
 			this.broadcast('players', { ready: this.canStart(), players: this.formattedPlayers() })
 			player.joinGame(this)
 		}
