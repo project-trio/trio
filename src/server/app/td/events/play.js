@@ -14,7 +14,8 @@ module.exports = (io, socket) => {
 		}
 		if (player) {
 			if (data.lives !== undefined) {
-				if (!player.setLives(data.lives)) {
+				player.setLives(data.lives)
+				if (player.didLose()) {
 					game.checkFinished()
 				}
 			}

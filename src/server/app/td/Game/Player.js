@@ -6,7 +6,6 @@ module.exports = class Player {
 
 		this.joined = true
 		this.ready = false
-		this.lost = false
 		this.finished = false
 		this.serverUpdate = null
 
@@ -22,11 +21,11 @@ module.exports = class Player {
 	setLives (lives) {
 		this.send.lives = lives
 		this.lives = lives
-		if (lives <= 0) {
-			this.lost = true
-			return false
-		}
-		return true
+		return this.didLose()
+	}
+
+	didLose () {
+		return this.lives <= 0
 	}
 
 	score () {

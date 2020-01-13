@@ -150,22 +150,40 @@ class Game {
 
 	//LEAVE
 
-	checkFinished () {
+	hasMultipleActivePlayers () {
+		let remainingActivePlayerCount = 0
 		for (const player of this.players) {
-			if (player.joined && !player.lost && (!this.wavesFinished || !player.finished)) {
-				return false
+			if (player.joined && !player.finished && !player.didLose()) {
+				if (remainingActivePlayerCount > 0) {
+					return true
+				}
+				remainingActivePlayerCount += 1
 			}
 		}
-		this.finish()
+		return false
+	}
+
+	checkFinished () {
+		if (!this.hasMultipleActivePlayers()) {
+			this.finish()
+		}
+	}
+
+	hasValidParticipant () {
+		for (const player of this.players) {
+			if (player.waveNumber >= 2 || !player.didLose()) {
+				return true
+			}
+		}
+		return false
 	}
 
 	async finish () {
-		if (this.finished) {
+		if (this.state === 'finished') {
 			return console.log('Game already finished')
 		}
 		console.log(new Date().toLocaleTimeString(), this.id, 'TD finished')
 		this.state = 'finished'
-		this.finished = true
 		if (this.singleplayer) {
 			const player = this.players[0]
 			if (player.waveNumber >= this.waves) {
@@ -176,15 +194,8 @@ class Game {
 					ActivityModel.create(user, { action: 'highscore', body: `${this.mode} ${displayTime(score)}`, target_id: 2, target_type: 'topic' })
 				}
 			}
-		} else {
-			let hasParticipant = false
-			for (const player of this.players) {
-				if (player.lives > 0 || player.waveNumber >= 2) {
-					hasParticipant = true
-					break
-				}
-			}
-			if (hasParticipant) {
+		} else { // Multiplayer
+			if (this.hasValidParticipant()) {
 				const data = this.players.map(p => [ p.user.id, p.lives, p.wavesWon ]).sort((a, b) => {
 					const scoreA = -20 + a[1] + a[2] * 10
 					const scoreB = -20 + b[1] + b[2] * 10
