@@ -1,14 +1,13 @@
 const Config = require('../config')
-const Game = require('../Game')
+const MobaGame = require('../Game')
 
-const Lobby = require('../lobby')
-const Queue = require('../lobby/queue')
+const LobbyQueue = require('../lobby/queue')
 
 const MODE_NAMES = Config.GAME_MODES.map((mode) => mode.name)
 
-const createGame = function (io, player, mode, size, map, joining, autoStart) {
+const createGame = function (io, socket, mode, size, map, joining, autoStart) {
 	const response = {}
-	if (player.game) {
+	if (socket.player) {
 		response.error = 'Already in a game'
 	} else if (mode !== 'tutorial' && !MODE_NAMES.includes(mode)) {
 		response.error = 'Invalid game mode'
@@ -20,9 +19,9 @@ const createGame = function (io, player, mode, size, map, joining, autoStart) {
 		if (size < 0 || size > 25) { //TODO validate game settings
 			response.error = 'Invalid game size'
 		} else {
-			const game = new Game(io, mode, size, map, autoStart)
+			const game = new MobaGame(io, mode, size, map, autoStart)
 			if (joining) {
-				const joinData = game.add(player)
+				const joinData = game.addSocket(socket)
 				if (joinData.error) {
 					game.destroy()
 					response.error = joinData.error
@@ -30,7 +29,7 @@ const createGame = function (io, player, mode, size, map, joining, autoStart) {
 				}
 			}
 			if (!response.error) {
-				Lobby.broadcastWith(io, false, true)
+				LobbyQueue.broadcastWith(io, false, true)
 				response.gid = game.id
 			}
 		}
@@ -38,30 +37,26 @@ const createGame = function (io, player, mode, size, map, joining, autoStart) {
 	return response
 }
 
-const quickJoin = function (io, player, mode, size, map) {
-	const games = Game.all
+const quickJoin = function (io, socket, mode, size, map) {
+	const games = MobaGame.all
 	for (const game of games) {
 		if (game.mode === game && game.size === size && game.map === map) {
-			const gameData = game.add(player)
+			const gameData = game.addSocket(socket)
 			if (!gameData.error) {
-				return { gid: game.id }
+				return gameData
 			}
 		}
 	}
-	return createGame(io, player, mode, size, map, true, true)
+	return createGame(io, socket, mode, size, map, true, true)
 }
 
-const join = function (player, gid, callback) {
-	const games = Game.all
+const join = function (socket, gid, callback) {
+	const games = MobaGame.all
 	for (const game of games) {
 		if (game.id === gid) {
-			const gameData = game.add(player)
-			if (gameData.error) {
-				callback({ error: gameData.error })
-				return false
-			}
+			const gameData = game.addSocket(socket)
 			callback(gameData)
-			return true
+			return !gameData.error
 		}
 	}
 	callback({error: "Game doesn't exist"})
@@ -77,10 +72,10 @@ module.exports = (io, socket) => {
 		} else {
 			const game = player.game
 			if (game) {
-				if (game.hostId === user.id) {
+				if (game.hostID === user.id) {
 					if (game.canStart()) {
 						game.start()
-						Lobby.broadcastWith(io, false, true)
+						LobbyQueue.broadcastWith(io, false, true)
 					} else {
 						response.error = 'Waiting for players to join'
 					}
@@ -97,42 +92,49 @@ module.exports = (io, socket) => {
 	socket.on('lobby action', (data, callback) => {
 		console.log('lobby action', data)
 		const player = socket.player
-		if (player.game && data.gid !== player.game.id) {
+		if (player && data.gid !== player.game.id && player.game.isPlaying()) {
 			console.log('reenter', player.game.id, data.gid)
 			callback({ reenter: player.game.id })
 			return
 		}
 		if (data.action !== 'queue') {
-			Queue.remove(player)
+			LobbyQueue.removeSocket(socket)
 		}
 		if (data.action === 'enter') {
-			if (player.game && data.gid) {
-				player.leaveGame()
+			if (player && data.gid) {
+				player.game.remove(socket)
 			}
 			socket.join('lobby')
-			callback({ online: Lobby.playerCount, games: Game.getList() })
+			callback({ online: LobbyQueue.playerCount, games: MobaGame.getList() })
 		} else {
 			socket.leave('lobby')
 			if (data.action === 'queue') {
-				Queue.add(player, data)
+				LobbyQueue.add(socket, data)
 			} else if (data.action === 'leave') {
-				player.leaveGame()
+				if (player) {
+					player.game.remove(socket)
+				}
 			} else if (data.action === 'quick') {
-				const gameResponse = quickJoin(io, player, data.mode, data.size, data.map)
+				const gameResponse = quickJoin(io, socket, data.mode, data.size, data.map)
 				callback(gameResponse)
 			} else if (data.action === 'create') {
-				const gameResponse = createGame(io, player, data.mode, data.size, data.map, false, false)
+				const gameResponse = createGame(io, socket, data.mode, data.size, data.map, false, false)
 				callback(gameResponse)
 			} else if (data.action === 'join') {
-				join(player, data.gid, callback)
+				join(socket, data.gid, callback)
 			} else {
 				console.error('Unknown lobby action', data)
 			}
 		}
 	})
 
-	socket.on('queue', (data, callback) => {
-		const player = socket.player
-		Queue.updatePlayer(player, data)
+	socket.on('queue', (data) => {
+		LobbyQueue.updateSocket(socket, data)
+	})
+
+	socket.on('disconnect', () => {
+		//TODO queuingSockets
+		LobbyQueue.removeSocket(socket)
+		LobbyQueue.broadcastWith(io, true, true)
 	})
 }

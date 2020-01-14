@@ -45,7 +45,7 @@ module.exports = function (io, socket) {
 	socket.on('chat', (data, callback) => {
 		const player = socket.player
 		const response = {}
-		if (!player || (!player.game && !player.queueing)) {
+		if (!player || (!player.game && !player.queuer)) {
 			response.error = 'Not in game'
 		} else {
 			const updateTime = CommonUtils.now() // player.game.serverUpdate
@@ -54,7 +54,7 @@ module.exports = function (io, socket) {
 			} else {
 				player.chatAt = updateTime
 				data.at = updateTime
-				if (player.queueing) {
+				if (player.queuer) {
 					data.from = player.user.name
 					io.to('queue').emit('msg', data)
 				} else {

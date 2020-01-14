@@ -47,16 +47,11 @@ module.exports = {
 			callback(socket)
 
 			socket.on('disconnect', () => {
-				const user = socket.user
-				if (user) {
-					if (socket.game) {
-						socket.game.remove(socket)
-					}
-					if (user.gameName === socket.nsp.name) {
-						user.gameName = null
-					}
-					live.disconnect(socket)
+				const player = socket.player
+				if (player) {
+					player.game.remove(socket)
 				}
+				live.disconnect(socket)
 			})
 		})
 		return namespace

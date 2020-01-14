@@ -1,14 +1,12 @@
-module.exports = class Player {
+const Player = require.main.require('./app/Game/Player')
 
-	constructor (socket, user) {
-		this.socket = socket
-		this.user = user
+module.exports = class TDPlayer extends Player {
 
-		this.isJoined = true
+	constructor (socket, game) {
+		super(socket, game)
+
 		this.isReadyToStart = false
 		this.finished = false
-		this.serverUpdate = null
-
 		this.waveNumber = 0
 		this.waveDuration = 0
 		this.lives = 20

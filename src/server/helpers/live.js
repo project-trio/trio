@@ -19,6 +19,11 @@ const sendUpdate = (user, data) => {
 	trio.in('home').emit('update action', data)
 }
 
+const namespaceToTopicID = {
+	moba: 1,
+	td: 2,
+}
+
 module.exports = {
 
 	initData () {
@@ -62,14 +67,19 @@ module.exports = {
 		if (userIds.size) {
 			const activityUsers = await require.main.require('./models/user').all(Array.from(userIds), true)
 			for (const user of activityUsers) {
+				user.online = 0
+				user.gameData = {
+					topicID: null,
+					id: null,
+				}
 				users[user.id] = user
 			}
 		}
 
-		for (const topicId in scores) {
-			const topicScores = scores[topicId]
+		for (const topicID in scores) {
+			const topicScores = scores[topicID]
 			const topicUsers = {}
-			gameUsers[topicId] = topicUsers
+			gameUsers[topicID] = topicUsers
 			for (const mode in topicScores) {
 				const modeScores = topicScores[mode]
 				for (const score of modeScores) {
@@ -80,13 +90,13 @@ module.exports = {
 		}
 	},
 
-	getGameStats (topicId) {
-		return { users: gameUsers[topicId], scores: scores[topicId] }
+	getGameStats (topicID) {
+		return { users: gameUsers[topicID], scores: scores[topicID] }
 	},
 
-	addHighscore (user, topicId, mode, score) {
+	addHighscore (user, topicID, mode, score) {
 		const uid = user.id
-		const modeScores = scores[topicId][mode]
+		const modeScores = scores[topicID][mode]
 		if (modeScores.length) {
 			let updatedScore = false
 			for (let idx = 0; idx < modeScores.length; idx += 1) {
@@ -98,7 +108,7 @@ module.exports = {
 					}
 				} else if (modeScore[1] > score) {
 					modeScores.splice(idx, 0, [ uid, score ])
-					gameUsers[topicId][uid] = users[uid]
+					gameUsers[topicID][uid] = users[uid]
 					updatedScore = true
 				}
 			}
@@ -159,11 +169,12 @@ module.exports = {
 	// User
 
 	connectUser (socket, privateUser, gameName) {
-		const userId = privateUser.id
-		const existingUser = users[userId]
+		const userID = privateUser.id
+		const existingUser = users[userID]
 		let user, updateUser
+		const topicID = gameName ? namespaceToTopicID[gameName] : null
 		if (existingUser) {
-			if (gameName && existingUser.gameName) {
+			if (existingUser.gameData && existingUser.gameData.id) {
 				return false
 			}
 			existingUser.at = privateUser.at
@@ -173,14 +184,18 @@ module.exports = {
 				existingUser.online += 1
 			}
 			updateUser = {
-				id: userId,
+				id: userID,
 				online: existingUser.online,
 				at: now(),
+				gameData: {
+					topicID: topicID || existingUser.gameData.topicID,
+					id: null,
+				},
 			}
 			user = existingUser
 		} else {
 			user = {
-				id: userId,
+				id: userID,
 				name: privateUser.name,
 				ccid: privateUser.ccid,
 				md5: privateUser.md5,
@@ -188,14 +203,15 @@ module.exports = {
 				admin: privateUser.admin,
 				created_at: privateUser.created_at,
 				online: 1,
+				gameData: {
+					topicID,
+					id: null,
+				},
 			}
-			users[userId] = user
+			users[userID] = user
 			updateUser = user
 		}
 		socket.user = user
-		if (gameName) {
-			user.gameName = gameName
-		}
 		socket.emit('local', { id: user.id, name: user.name, email: privateUser.email, ccid: user.ccid, md5: user.md5, admin: user.admin })
 		trio.in('home').emit('update action', { user: updateUser })
 		return true
@@ -203,6 +219,9 @@ module.exports = {
 
 	disconnect (socket) {
 		const user = socket.user
+		if (!user) {
+			return
+		}
 		user.online -= 1
 		if (user.online === 0) {
 			trio.in('home').emit('update action', { user })

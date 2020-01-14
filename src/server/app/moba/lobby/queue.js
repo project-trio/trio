@@ -1,20 +1,35 @@
 const { randomItem } = require.main.require('../common/utils')
 
+const MobaGame = require('../Game')
+
 let io
 
-const queuedPlayers = []
+const queuers = []
 
-const removePlayer = function (player, index) {
-	player.queueing = false
-	if (index === undefined) {
-		index = queuedPlayers.indexOf(player)
+class Queuer {
+	constructor (socket, data) {
+		this.socket = socket
+		this.update(data)
 	}
-	if (index === -1) {
-		console.error('UNKNOWN QUEUE PLAYER', player)
-		return false
+
+	update (data) {
+		this.queueReady = data.ready
+		this.queueMin = data.size
+		this.queueMap = data.map
 	}
-	queuedPlayers.splice(index, 1)
-	return true
+
+	remove (index) {
+		this.socket.queuer = null
+		if (index === undefined) {
+			index = queuers.indexOf(this)
+		}
+		if (index === -1) {
+			console.error('UNKNOWN QUEUE PLAYER', this)
+			return false
+		}
+		queuers.splice(index, 1)
+		return true
+	}
 }
 
 module.exports = {
@@ -23,49 +38,51 @@ module.exports = {
 		io = _io
 	},
 
-	add (player, data) {
-		player.join('queue')
-		if (!player.queueing) {
-			player.queueing = true
-			queuedPlayers.push(player)
+	add (socket, data) {
+		socket.join('queue')
+		const queuer = socket.queuer
+		if (queuer) {
+			queuer.update(data)
+		} else {
+			const queuer = new Queuer(socket, data)
+			socket.queuer = queuer
+			queuers.push(queuer)
 		}
-		this.updatePlayer(player, data)
+		this.update()
 	},
 
 	update () {
-		const queuedCount = queuedPlayers.length
+		const queuedCount = queuers.length
 		const maxCountSize = 10
 		const queuedSizes = new Array(maxCountSize).fill(0).map((_, idx) => { return (idx + 1) * 2 })
 		const readiedCounts = [...queuedSizes]
-		for (const player of queuedPlayers) {
-			for (let size = maxCountSize; size >= player.queueMin; size -= 1) {
+		for (const queuer of queuers) {
+			for (let size = maxCountSize; size >= queuer.queueMin; size -= 1) {
 				queuedSizes[size - 1] -= 1
-				if (player.queueReady) {
+				if (queuer.queueReady) {
 					readiedCounts[size - 1] -= 1
 				}
 			}
 		}
 		for (let size = readiedCounts.length; size >= 1; size -= 1) {
 			if (readiedCounts[size - 1] <= 0) {
-				const Game = require.main.require('./game/game')
 				const map = size <= 2 ? 'tiny' : size <= 3 ? 'small' : size <= 6 ? 'standard' : 'large'
-				const game = new Game(io, 'pvp', size, map, true)
+				const game = new MobaGame(io, 'pvp', size, map, true)
 
 				const requestedMaps = []
 				for (let idx = 0; idx < queuedCount; idx += 1) {
-					const player = queuedPlayers[idx]
-					if (player.queueReady && player.queueMin <= size) {
-						if (removePlayer(player, idx)) {
+					const queuer = queuers[idx]
+					if (queuer.queueReady && queuer.queueMin <= size) {
+						if (queuer.remove(idx)) {
 							idx -= 1
 						}
-						if (player.queueMap) {
-							requestedMaps.push(player.queueMap)
+						if (queuer.queueMap) {
+							requestedMaps.push(queuer.queueMap)
 						}
-						const joinData = game.add(player)
-						if (joinData.error) {
-							player.emit('queue', { error: joinData.error })
-						} else {
-							player.emit('queue', { gid: game.id })
+						const socket = queuer.socket
+						const gameData = game.addSocket(socket)
+						if (gameData.error) {
+							socket.emit('joined game', { error: gameData.error })
 						}
 						if (game.checkFull()) {
 							break
@@ -86,17 +103,33 @@ module.exports = {
 		})
 	},
 
-	updatePlayer (player, data) {
-		player.updateQueue(data)
+	updateSocket (socket, data) {
+		const queuer = socket.queuer
+		if (!queuer) {
+			return
+		}
+		queuer.update(data)
 		this.update()
 	},
 
-	remove (player) {
-		player.leave('queue')
-		if (player.queueing) {
-			removePlayer(player)
+	removeSocket (socket) {
+		socket.leave('queue')
+		const queuer = socket.queuer
+		if (queuer) {
+			queuer.remove(undefined)
 			this.update()
 		}
+	},
+
+	broadcastWith (io, withPlayers, withGames) {
+		const data = {}
+		if (withPlayers) {
+			data.online = 0 //TODO
+		}
+		if (withGames) {
+			data.games = MobaGame.getList()
+		}
+		io.to('lobby').emit('lobby', data)
 	},
 
 }

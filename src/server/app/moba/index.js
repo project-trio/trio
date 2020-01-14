@@ -2,45 +2,24 @@ const middleware = require.main.require('./helpers/middleware')
 
 // const { VERSION } = require('./config')
 
-const Lobby = require('./lobby')
 const LobbyQueue = require('./lobby/queue')
 
-const Player = require('./Game/Player')
-
-const lobbyEvents = require('./events/lobby')
-const playEvents = require('./events/play')
-
-const clientPlayers = {}
+const MobaGame = require('./Game')
 
 module.exports = (io) => {
 	const moba = middleware.namespace(io, 'moba', (socket) => {
 		const user = socket.user
 		const userID = user.id
-		let player = clientPlayers[userID]
+		const player = MobaGame.findPlayerForUserID(userID)
 		if (player) {
+			socket.player = player
 			player.socket = socket
-		} else {
-			player = new Player(socket, user)
-			clientPlayers[userID] = player
-			Lobby.broadcastWith(moba, true, false)
+			//TODO rejoin
 		}
-		socket.player = player
+		LobbyQueue.broadcastWith(moba, true, false)
 
-		lobbyEvents(moba, socket)
-		playEvents(moba, socket)
-
-		socket.on('disconnect', () => {
-			const removePlayerPermanently = player.disconnect()
-			if (clientPlayers[userID]) {
-				if (removePlayerPermanently) {
-					delete clientPlayers[userID]
-					player = null
-				} else {
-					player.socket = null
-				}
-			}
-			Lobby.broadcastWith(moba, true, removePlayerPermanently)
-		})
+		require('./events/lobby')(moba, socket)
+		require('./events/play')(moba, socket)
 	})
 
 	// moba.use((socket, next) => { //TODO

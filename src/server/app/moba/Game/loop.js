@@ -1,20 +1,16 @@
-const { TESTING } = require.main.require('../common/constants')
-
 const { UPDATE_DURATION } = require('../config')
 
-const Lobby = require('../lobby')
+const LobbyQueue = require('../lobby/queue')
 
 const Game = require('./index.js')
 
 const startTime = process.hrtime()
 
-const MAX_IDLE_UPDATES = TESTING ? 1000 : 1000
-
 let io, loopCount = 0
 
 function runLoop () {
 	for (const game of Game.all) {
-		if (game.started) {
+		if (game.isPlaying()) {
 			let actionFound = false
 			const actionData = []
 			const currentUpdate = game.serverUpdate
@@ -82,20 +78,15 @@ function runLoop () {
 			}
 			if (actionFound) {
 				game.idleCount = 0
-			} else if (game.idleCount > MAX_IDLE_UPDATES) {
-				console.log(game.id, 'Game timed out due to inactivity')
-				game.broadcast('closed')
-				game.destroy()
+			} else if (game.idleTimeout()) {
 				continue
-			} else {
-				game.idleCount += 1
 			}
 			game.broadcast('update', { update: currentUpdate, actions: actionData })
 			game.serverUpdate = currentUpdate + 1
-		} else if (game.autoStart && game.checkFull()) {
+		} else if (game.autoStart && game.checkFull()) { //TODO refactor
 			if (game.autoStart > 1) {
 				game.start()
-				Lobby.broadcastWith(io, false, true)
+				LobbyQueue.broadcastWith(io, false, true)
 			} else {
 				game.autoStart += 1
 			}

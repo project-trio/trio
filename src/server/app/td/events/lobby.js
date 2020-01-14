@@ -50,7 +50,7 @@ module.exports = (io, socket) => {
 		const game = new Game(io, mode, sockets.length)
 		for (const socket of sockets) {
 			leaveQueue(socket)
-			game.add(socket)
+			game.addSocket(socket)
 		}
 	}
 
@@ -106,21 +106,22 @@ module.exports = (io, socket) => {
 
 	socket.on('singleplayer', (mode) => {
 		const game = new Game(io, mode, 1)
-		game.add(socket)
+		game.addSocket(socket)
 	})
 
 	socket.on('join game', (gid) => {
 		for (const game of Game.all) {
 			if (game.id === gid) {
-				return game.add(socket)
+				return game.addSocket(socket)
 			}
 		}
 		socket.emit('joined game', { error: 'Game not found' })
 	})
 
 	socket.on('ready', () => {
-		if (socket.game) {
-			socket.game.ready(socket)
+		const player = socket.player
+		if (player) {
+			player.game.ready(socket)
 		}
 	})
 

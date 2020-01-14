@@ -1,10 +1,12 @@
 const { TESTING } = require.main.require('../common/constants')
 
-const { uid, displayTime } = require.main.require('./helpers/util')
+const { displayTime } = require.main.require('./helpers/util')
 
 const { TICK_DURATION, UPDATE_DURATION, VERSION } = require('./config')
 
-const Player = require('./Player')
+const Game = require.main.require('./app/Game')
+
+const TDPlayer = require('./Player')
 
 const ActivityModel = require.main.require('./models/activity')
 const GameModel = require.main.require('./models/game')
@@ -14,19 +16,14 @@ const UserModel = require.main.require('./models/user')
 
 const games = []
 
-class Game {
+class TDGame extends Game {
 
-	constructor (io, mode, playerCount) {
-		this.id = uid()
-		this.mode = mode
-		this.players = []
-		this.io = io.to(this.id)
-		this.state = 'open'
+	constructor (io, mode, size) {
+		super(io, mode)
 		this.broadcastsPlaying = false
-		this.serverUpdate = 0
 		this.idleCount = 0
-		this.singleplayer = playerCount <= 1
-		this.updatesUntilStart = (TESTING && playerCount <= 1 ? 3 : 15) * 1000 / UPDATE_DURATION
+		this.singleplayer = size <= 1
+		this.updatesUntilStart = (TESTING && size <= 1 ? 3 : 15) * 1000 / UPDATE_DURATION
 
 		this.waves = 50 //SAMPLE
 		this.wavesFinished = false
@@ -38,55 +35,6 @@ class Game {
 
 		console.log(new Date().toLocaleTimeString(), this.id, 'TD created', this.mode)
 		games.push(this)
-	}
-
-	//PRIVATE
-
-	playerById (id) {
-		for (const player of this.players) {
-			if (player.user.id === id) {
-				return player
-			}
-		}
-		return null
-	}
-
-	playerIndexOf (id) {
-		const players = this.players
-		for (let idx = 0; idx < players.length; idx += 1) {
-			const player = players[idx]
-			if (player.user.id === id) {
-				return idx
-			}
-		}
-		return null
-	}
-
-	playerCount () {
-		return this.players.length
-	}
-
-	hasJoinedPlayer () {
-		for (const player of this.players) {
-			if (player.isJoined) {
-				return true
-			}
-		}
-		return false
-	}
-
-	//STATE
-
-	isStarted () {
-		return this.state !== 'open'
-	}
-
-	isFinished () {
-		return this.state === 'finished'
-	}
-
-	isPlaying () {
-		return this.isStarted() && !this.isFinished()
 	}
 
 	//JOIN
@@ -113,7 +61,7 @@ class Game {
 				return
 			}
 		}
-		this.state = 'started'
+		this.state = Game.STATE_STARTED
 		this.broadcastsPlaying = true
 		this.waveNumber = 1
 		this.startTime = new Date()
@@ -128,36 +76,23 @@ class Game {
 		})
 	}
 
-	add (socket) {
+	addSocket (socket) {
 		const user = socket.user
 		const pid = user.id
-		let data
 		let player = this.playerById(pid)
 		if (player) {
 			player.isJoined = true
-			socket.player = player
 			this.broadcast('update player', { pid, joined: true })
-			data = {
-				gid: this.id,
-				players: this.formattedPlayers(),
-				tickDuration: TICK_DURATION,
-				updateDuration: UPDATE_DURATION,
-				updatesUntilStart: this.updatesUntilStart,
-				// history: this.history, //TODO
-			}
-			console.log('Rejoin game', this.id, user.id)
 		} else {
 			if (this.isStarted()) {
 				return socket.emit('joined game', { error: `Already playing ${this.id}` })
 			}
-			player = new Player(socket, user)
+			player = new TDPlayer(socket, this)
 			this.players.push(player)
-			data = { gid: this.id }
 		}
-		socket.game = this
 		socket.player = player
 		socket.join(this.id, () => {
-			socket.emit('joined game', data)
+			socket.emit('joined game', { gid: this.id })
 		})
 	}
 
@@ -196,7 +131,7 @@ class Game {
 			return console.log('ERR', this.id, 'Game already finished')
 		}
 		console.log(new Date().toLocaleTimeString(), this.id, 'TD finished')
-		this.state = 'finished'
+		this.state = Game.STATE_FINISHED
 		if (this.singleplayer) {
 			const player = this.players[0]
 			if (player.waveNumber >= this.waves) {
@@ -222,16 +157,7 @@ class Game {
 	}
 
 	destroy () {
-		for (const player of this.players) {
-			const socket = player.socket
-			if (socket) {
-				socket.leave(this.id)
-				if (socket.game === this) {
-					socket.game = null
-					socket.player = null
-				}
-			}
-		}
+		super.destroy()
 
 		for (let idx = games.length - 1; idx >= 0; idx -= 1) {
 			if (this === games[idx]) {
@@ -242,36 +168,11 @@ class Game {
 		console.log('ERR unable to remove deleted game', this.id)
 	}
 
-	remove (socket) {
-		const pid = socket.user.id
-		const leaveIndex = this.playerIndexOf(pid)
-		if (leaveIndex !== null) {
-			if (this.isStarted()) {
-				const player = this.players[leaveIndex]
-				player.isJoined = false
-			} else {
-				this.players.splice(leaveIndex, 1)
-				socket.game = null
-				socket.player = null
-			}
-
-			if (!this.hasJoinedPlayer()) {
-				this.destroy()
-				return true
-			}
-			this.broadcast('update player', { pid, joined: false })
-		}
-	}
-
-	broadcast (name, message) {
-		this.io.emit(name, message)
-	}
-
 }
 
-Game.all = games
+TDGame.all = games
 
-Game.getList = function () {
+TDGame.getList = function () {
 	const result = []
 	for (let idx = games.length - 1; idx >= 0; idx -= 1) {
 		const game = games[idx]
@@ -285,4 +186,4 @@ Game.getList = function () {
 	return result
 }
 
-module.exports = Game
+module.exports = TDGame

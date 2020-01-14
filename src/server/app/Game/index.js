@@ -1,0 +1,116 @@
+const { TESTING } = require.main.require('../common/constants')
+
+const { uid } = require.main.require('./helpers/util')
+
+const MAX_IDLE_UPDATES = TESTING ? 1000 : 1000
+
+class Game {
+
+	constructor (io, mode) {
+		const id = uid()
+		this.id = id
+		this.io = io.to(id)
+		this.mode = mode
+		this.state = Game.STATE_OPEN
+		this.players = []
+
+		this.serverUpdate = 0
+		this.idleCount = 0
+	}
+
+	isStarted () {
+		return this.state !== Game.STATE_OPEN
+	}
+
+	isFinished () {
+		return this.state === Game.STATE_FINISHED
+	}
+
+	isPlaying () {
+		return this.isStarted() && !this.isFinished()
+	}
+
+	idleTimeout () {
+		if (this.idleCount > MAX_IDLE_UPDATES) {
+			console.log(this.id, 'Game timed out due to inactivity')
+			this.broadcast('closed')
+			this.destroy()
+			return true
+		}
+		this.idleCount += 1
+		return false
+	}
+
+	destroy () {
+		for (const player of this.players) {
+			player.removeFromGame(this)
+		}
+		this.players = []
+	}
+
+	broadcast (name, message) {
+		this.io.emit(name, message)
+	}
+
+	// Players
+
+	playerCount () {
+		return this.players.length
+	}
+
+	playerIndexOf (id) {
+		const players = this.players
+		for (let idx = 0; idx < players.length; idx += 1) {
+			const player = players[idx]
+			if (player.user.id === id) {
+				return idx
+			}
+		}
+		return null
+	}
+
+	playerById (id) {
+		for (const player of this.players) {
+			if (player.user.id === id) {
+				return player
+			}
+		}
+		return null
+	}
+
+	hasJoinedPlayer () {
+		for (const player of this.players) {
+			if (player.isJoined) {
+				return true
+			}
+		}
+		return false
+	}
+
+	remove (socket) {
+		const pid = socket.user.id
+		const leaveIndex = this.playerIndexOf(pid)
+		if (leaveIndex !== null) {
+			const player = socket.player
+			if (this.isPlaying()) {
+				player.isJoined = false
+			} else {
+				player.removeFromGame(this)
+				this.players.splice(leaveIndex, 1)
+			}
+
+			if (!this.hasJoinedPlayer()) {
+				this.destroy()
+				return true
+			}
+			this.broadcast('update player', { pid, joined: false })
+		}
+	}
+
+}
+
+Game.STATE_OPEN = 'OPEN'
+Game.STATE_STARTED = 'STARTED'
+Game.STATE_FINISHED = 'FINISHED'
+
+module.exports = Game
