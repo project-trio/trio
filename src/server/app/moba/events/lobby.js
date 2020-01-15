@@ -90,8 +90,8 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('lobby action', (data, callback) => {
-		console.log('lobby action', data)
 		const player = socket.player
+		console.log('lobby action', player && player.user.id, data)
 		if (player && data.gid !== player.game.id && player.game.isPlaying()) {
 			console.log('reenter', player.game.id, data.gid)
 			callback({ reenter: player.game.id })
@@ -111,7 +111,7 @@ module.exports = (io, socket) => {
 			if (data.action === 'queue') {
 				LobbyQueue.add(socket, data)
 			} else if (data.action === 'leave') {
-				if (player) {
+				if (player && data.gid !== player.game.id) {
 					player.game.remove(socket)
 				}
 			} else if (data.action === 'quick') {
@@ -133,7 +133,6 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('disconnect', () => {
-		//TODO queuingSockets
 		LobbyQueue.removeSocket(socket)
 		LobbyQueue.broadcastWith(io, true, true)
 	})

@@ -1,4 +1,4 @@
-const { randomItem } = require.main.require('../common/utils')
+const { now, randomItem } = require.main.require('../common/utils')
 
 const MobaGame = require('../Game')
 
@@ -13,7 +13,7 @@ class Queuer {
 	}
 
 	update (data) {
-		this.queueReady = data.ready
+		this.isReadyPressed = data.ready
 		this.queueMin = data.size
 		this.queueMap = data.map
 	}
@@ -31,6 +31,8 @@ class Queuer {
 		return true
 	}
 }
+
+let queueExpiredTimeout = null, queuePendingForSize = null, queuePopAt = null
 
 module.exports = {
 
@@ -51,55 +53,95 @@ module.exports = {
 		this.update()
 	},
 
+	popQueueAt (size) {
+		const map = size <= 2 ? 'tiny' : size <= 3 ? 'small' : size <= 6 ? 'standard' : 'large'
+		const game = new MobaGame(io, 'pvp', size, map, true)
+		const requestedMaps = []
+		for (let idx = 0; idx < queuers.length; idx += 1) {
+			const queuer = queuers[idx]
+			if (queuer.isReadyPressed && queuer.queueMin <= size) {
+				if (queuer.remove(idx)) {
+					idx -= 1
+				}
+				if (queuer.queueMap) {
+					requestedMaps.push(queuer.queueMap)
+				}
+				const socket = queuer.socket
+				const gameData = game.addSocket(socket)
+				if (gameData.error) {
+					console.log('Unable to join queued game', gameData.error)
+					socket.emit('joined game', { error: gameData.error })
+				}
+				if (game.checkFull()) {
+					break
+				}
+			}
+		}
+		if (!game.checkFull()) {
+			console.log('ERR: Insufficient players for queued game', size, queuers)
+			return game.destroy()
+		}
+		if (requestedMaps.length) {
+			game.setMap(randomItem(requestedMaps))
+		}
+		return this.update()
+
+	},
+
 	update () {
-		const queuedCount = queuers.length
 		const maxCountSize = 10
-		const queuedSizes = new Array(maxCountSize).fill(0).map((_, idx) => { return (idx + 1) * 2 })
-		const readiedCounts = [...queuedSizes]
+		const queuersMissingForSizes = new Array(maxCountSize).fill(0).map((_, idx) => { return (idx + 1) * 2 })
+		const readiedMissingForSizes = [...queuersMissingForSizes]
 		for (const queuer of queuers) {
 			for (let size = maxCountSize; size >= queuer.queueMin; size -= 1) {
-				queuedSizes[size - 1] -= 1
-				if (queuer.queueReady) {
-					readiedCounts[size - 1] -= 1
+				const sizeIndex = size - 1
+				queuersMissingForSizes[sizeIndex] -= 1
+				if (queuer.isReadyPressed) {
+					const missingCountForSize = readiedMissingForSizes[sizeIndex] - 1
+					if (missingCountForSize === 0) {
+						return this.popQueueAt(size)
+					}
+					readiedMissingForSizes[sizeIndex] = missingCountForSize
 				}
 			}
 		}
-		for (let size = readiedCounts.length; size >= 1; size -= 1) {
-			if (readiedCounts[size - 1] <= 0) {
-				const map = size <= 2 ? 'tiny' : size <= 3 ? 'small' : size <= 6 ? 'standard' : 'large'
-				const game = new MobaGame(io, 'pvp', size, map, true)
-
-				const requestedMaps = []
-				for (let idx = 0; idx < queuedCount; idx += 1) {
-					const queuer = queuers[idx]
-					if (queuer.queueReady && queuer.queueMin <= size) {
-						if (queuer.remove(idx)) {
-							idx -= 1
-						}
-						if (queuer.queueMap) {
-							requestedMaps.push(queuer.queueMap)
-						}
-						const socket = queuer.socket
-						const gameData = game.addSocket(socket)
-						if (gameData.error) {
-							socket.emit('joined game', { error: gameData.error })
-						}
-						if (game.checkFull()) {
-							break
+		let foundAvailableSize = null
+		for (let size = maxCountSize; size >= 1; size -= 1) {
+			const missingCountForSize = queuersMissingForSizes[size - 1]
+			if (missingCountForSize <= 0) {
+				foundAvailableSize = size
+				if (size === queuePendingForSize) {
+					console.log('Queue already pending for ', size)
+					break
+				}
+				queuePendingForSize = size
+				const pendingDuration = 20
+				queuePopAt = now() + pendingDuration
+				queueExpiredTimeout = setTimeout(() => {
+					queuePendingForSize = null
+					for (let idx = queuers.length - 1; idx >= 0; idx -= 1) {
+						const queuer = queuers[idx]
+						if (queuer.queueMin <= size) {
+							const wasReady = queuer.isReadyPressed
+							if (!wasReady) {
+								queuer.remove(idx)
+							}
+							queuer.socket.emit('queue expired', { error: wasReady ? 'A player did not confirm the ready check. They have been removed from the queue.' : 'You failed to confirm the ready check and have been removed from the queue.', backToLobby: !wasReady })
 						}
 					}
-				}
-				if (requestedMaps.length) {
-					game.setMap(randomItem(requestedMaps))
-				}
-
-				return this.update()
+					this.update()
+				}, pendingDuration * 1000)
 			}
 		}
-
+		if (foundAvailableSize !== queuePendingForSize) {
+			clearTimeout(queueExpiredTimeout)
+			queuePendingForSize = null
+		}
 		io.to('queue').emit('queue', {
-			players: queuedCount,
-			available: queuedSizes,
+			players: queuers.length,
+			available: queuersMissingForSizes,
+			popAt: queuePopAt,
+			popSize: queuePendingForSize,
 		})
 	},
 

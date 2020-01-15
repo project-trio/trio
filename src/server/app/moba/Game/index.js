@@ -22,21 +22,18 @@ class MobaGame extends Game {
 		if (this.botMode) {
 			const firstTeam = 1 //SAMPLE
 			for (let teamIndex = 0; teamIndex < size; teamIndex += 1) {
-				const player = new MobaPlayer(null, null, firstTeam)
-				this.players.push(player)
+				new MobaPlayer(null, this, firstTeam)
 			}
 			if (TESTING || size >= 10) {
 				const secondTeam = 1 - firstTeam
 				for (let teamIndex = 0; teamIndex < size - 1; teamIndex += 1) {
-					const player = new MobaPlayer(null, null, secondTeam)
-					this.players.push(player)
+					new MobaPlayer(null, this, secondTeam)
 				}
 			}
 		}
 
 		this.setMap(map)
-
-		console.log('Created game', this.id, mode, size, map)
+		console.log(this.id, 'Created game', mode, size, map)
 		games.push(this)
 	}
 
@@ -63,7 +60,7 @@ class MobaGame extends Game {
 		return results
 	}
 
-	canStart () {
+	validNumberOfPlayers () {
 		const playerCount = this.players.length
 		if (playerCount) {
 			if (this.botMode || this.tutorialMode) {
@@ -75,6 +72,19 @@ class MobaGame extends Game {
 			}
 		}
 		return false
+	}
+
+	allPlayersReady () {
+		for (const player of this.players) {
+			if (!player.joinCompleted) {
+				return false
+			}
+		}
+		return true
+	}
+
+	canStart () {
+		return this.validNumberOfPlayers() && this.allPlayersReady()
 	}
 
 	//JOIN
@@ -89,9 +99,8 @@ class MobaGame extends Game {
 
 	addSocket (socket) {
 		const pid = socket.user.id
-		const player = this.playerById(pid)
+		let player = this.playerById(pid)
 		if (player) {
-			player.isJoined = true
 			this.broadcast('update player', { pid, joined: true })
 		} else {
 			if (this.isStarted()) {
@@ -102,21 +111,29 @@ class MobaGame extends Game {
 			}
 			const teamCounts = this.teamCounts()
 			const team = teamCounts[0] <= teamCounts[1] ? 0 : 1
-			const player = new MobaPlayer(socket, this, team)
-			this.players.push(player)
+			player = new MobaPlayer(socket, this, team)
 			if (!this.hostID) {
 				this.hostID = pid
 			}
 			player.setRetro(this.retro, this.tutorialMode)
-			this.broadcast('players', { ready: this.canStart(), players: this.formattedPlayers() })
+			if (!this.autoStart) {
+				this.broadcast('players', { ready: this.canStart(), players: this.formattedPlayers() })
+			}
 		}
 		socket.player = player
 		socket.join(this.id, (error) => {
 			let data
+			if (this.destroyed) {
+				error = 'Game closed'
+			}
 			if (error) {
 				data = { error: error }
+				this.remove(socket)
 			} else {
-				data = { gid: this.id, host: this.hostID, mode: this.mode, size: this.size, map: this.map, ready: this.canStart(), players: this.formattedPlayers() }
+				data = { gid: this.id, hostID: this.hostID, mode: this.mode, size: this.size, map: this.map, ready: this.canStart(), players: this.formattedPlayers() }
+				if (socket.player && socket.player.game.id === this.id) {
+					socket.player.joinCompleted = true
+				}
 			}
 			socket.emit('joined game', data)
 		})
@@ -157,9 +174,9 @@ class MobaGame extends Game {
 			players: this.formattedPlayers(),
 			updatesUntilStart: this.updatesUntilStart,
 		}
-		this.broadcast('start game', startData)
+		this.broadcast('started game', startData)
 		this.state = Game.STATE_STARTED
-		console.log('Started game', this.id)
+		console.log(this.id, 'Started')
 		return startData
 	}
 

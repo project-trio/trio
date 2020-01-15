@@ -65,7 +65,7 @@ class TDGame extends Game {
 		this.broadcastsPlaying = true
 		this.waveNumber = 1
 		this.startTime = new Date()
-		this.broadcast('start game', {
+		this.broadcast('started game', {
 			gid: this.id,
 			players: this.formattedPlayers(),
 			tickDuration: TICK_DURATION,
@@ -80,18 +80,19 @@ class TDGame extends Game {
 		const user = socket.user
 		const pid = user.id
 		let player = this.playerById(pid)
-		if (player) {
-			player.isJoined = true
-			this.broadcast('update player', { pid, joined: true })
-		} else {
+		const isOldPlayer = !!player
+		if (!player) {
 			if (this.isStarted()) {
 				return socket.emit('joined game', { error: `Already playing ${this.id}` })
 			}
 			player = new TDPlayer(socket, this)
-			this.players.push(player)
 		}
 		socket.player = player
 		socket.join(this.id, () => {
+			player.joinCompleted = true
+			if (isOldPlayer) {
+				this.broadcast('update player', { pid, joined: true })
+			}
 			socket.emit('joined game', { gid: this.id })
 		})
 	}
@@ -101,7 +102,7 @@ class TDGame extends Game {
 	hasMultipleActivePlayers () {
 		let remainingActivePlayerCount = 0
 		for (const player of this.players) {
-			if (player.isJoined && !player.finished && !player.didLose()) {
+			if (player.joinCompleted && !player.finished && !player.didLose()) {
 				if (remainingActivePlayerCount > 0) {
 					return true
 				}

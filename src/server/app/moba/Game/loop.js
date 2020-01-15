@@ -84,11 +84,9 @@ function runLoop () {
 			game.broadcast('update', { update: currentUpdate, actions: actionData })
 			game.serverUpdate = currentUpdate + 1
 		} else if (game.autoStart && game.checkFull()) { //TODO refactor
-			if (game.autoStart > 1) {
+			if (game.allPlayersReady()) {
 				game.start()
 				LobbyQueue.broadcastWith(io, false, true)
-			} else {
-				game.autoStart += 1
 			}
 		}
 	}

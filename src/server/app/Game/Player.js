@@ -20,7 +20,9 @@ module.exports = class Player {
 		}
 
 		this.serverUpdate = null
-		this.isJoined = true
+		this.joinCompleted = false
+
+		game.players.push(this)
 	}
 
 	removeFromGame (game) {

@@ -16,6 +16,7 @@ class Game {
 
 		this.serverUpdate = 0
 		this.idleCount = 0
+		this.destroyed = false
 	}
 
 	isStarted () {
@@ -42,6 +43,7 @@ class Game {
 	}
 
 	destroy () {
+		this.destroyed = true
 		for (const player of this.players) {
 			player.removeFromGame(this)
 		}
@@ -80,7 +82,7 @@ class Game {
 
 	hasJoinedPlayer () {
 		for (const player of this.players) {
-			if (player.isJoined) {
+			if (player.joinCompleted) {
 				return true
 			}
 		}
@@ -93,12 +95,12 @@ class Game {
 		if (leaveIndex !== null) {
 			const player = socket.player
 			if (this.isPlaying()) {
-				player.isJoined = false
+				player.joinCompleted = false
 			} else {
 				player.removeFromGame(this)
 				this.players.splice(leaveIndex, 1)
+				console.log('Player left', pid, this.id)
 			}
-
 			if (!this.hasJoinedPlayer()) {
 				this.destroy()
 				return true
