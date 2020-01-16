@@ -1,10 +1,10 @@
 const { TESTING } = require.main.require('../common/constants')
 const { randomItem } = require.main.require('../common/utils')
+const { MODES } = require('../config')
 
 const live = require.main.require('./helpers/live')
 
 const Game = require('../Game')
-const { MODES } = require('../Game/config')
 
 const QUEUE_WAIT = TESTING ? 6 : 20
 

@@ -1,4 +1,4 @@
-const { UPDATE_DURATION } = require('./config')
+const { UPDATE_DURATION } = require('../config')
 
 const Game = require('./index.js')
 

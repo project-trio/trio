@@ -1,4 +1,5 @@
-const { TESTING, UPDATE_DURATION } = require.main.require('../common/constants')
+const { TESTING } = require.main.require('../common/constants')
+const { UPDATE_DURATION } = require('../config')
 
 const Game = require.main.require('./app/Game')
 
@@ -18,6 +19,7 @@ class MobaGame extends Game {
 		this.hostID = null
 		this.autoStart = autoStart
 		this.updatesUntilStart = this.tutorialMode ? 0 : ((TESTING ? 5 : 20) * 1000 / UPDATE_DURATION)
+		console.log('this.updatesUntilStart', this.updatesUntilStart)
 
 		if (this.botMode) {
 			const firstTeam = 1 //SAMPLE
@@ -176,7 +178,7 @@ class MobaGame extends Game {
 		}
 		this.broadcast('started game', startData)
 		this.state = Game.STATE_STARTED
-		console.log(this.id, 'Started')
+		console.log(this.id, 'Started', this.updatesUntilStart)
 		return startData
 	}
 

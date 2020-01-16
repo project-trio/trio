@@ -1,8 +1,7 @@
 const { TESTING } = require.main.require('../common/constants')
+const { TICK_DURATION, UPDATE_DURATION, VERSION } = require('../config')
 
 const { displayTime } = require.main.require('./helpers/util')
-
-const { TICK_DURATION, UPDATE_DURATION, VERSION } = require('./config')
 
 const Game = require.main.require('./app/Game')
 
@@ -23,7 +22,7 @@ class TDGame extends Game {
 		this.broadcastsPlaying = false
 		this.idleCount = 0
 		this.singleplayer = size <= 1
-		this.updatesUntilStart = (TESTING && size <= 1 ? 3 : 15) * 1000 / UPDATE_DURATION
+		this.updatesUntilStart = (TESTING && size <= 1 ? 4 : 15) * 1000 / UPDATE_DURATION
 
 		this.waves = 50 //SAMPLE
 		this.wavesFinished = false
