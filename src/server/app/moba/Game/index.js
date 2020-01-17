@@ -103,6 +103,9 @@ class MobaGame extends Game {
 		const pid = socket.user.id
 		let player = this.playerById(pid)
 		if (player) {
+			if (socket.player === player) {
+				return { gid: this.id }
+			}
 			this.broadcast('update player', { pid, joined: true })
 		} else {
 			if (this.isStarted()) {
