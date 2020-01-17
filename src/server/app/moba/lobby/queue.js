@@ -16,6 +16,7 @@ class Queuer {
 		this.isReadyPressed = data.ready
 		this.queueMin = data.size
 		this.queueMap = data.map
+		this.chatAt = 0
 	}
 
 	remove (index) {

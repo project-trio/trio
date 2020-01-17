@@ -43,22 +43,24 @@ module.exports = function (io, socket) {
 	})
 
 	socket.on('chat', (data, callback) => {
-		const player = socket.player
 		const response = {}
-		if (!player || (!player.game && !player.queuer)) {
-			response.error = 'Not in game'
+		const player = socket.player
+		const inGame = !!player
+		const chatObject = player || socket.queuer
+		if (!chatObject) {
+			response.error = `Not in queue`
 		} else {
 			const updateTime = CommonUtils.now() // player.game.serverUpdate
-			if (updateTime <= player.chatAt + 1) {
+			if (updateTime <= chatObject.chatAt + 1) {
 				response.error = 'Chatting too fast!'
 			} else {
-				player.chatAt = updateTime
+				chatObject.chatAt = updateTime
 				data.at = updateTime
-				if (player.queuer) {
-					data.from = player.user.name
+				if (!inGame) {
+					data.from = socket.user.name
 					io.to('queue').emit('msg', data)
 				} else {
-					data.id = player.user.id
+					data.id = socket.user.id
 					if (data.all) {
 						player.game.broadcast('msg', data)
 					} else {

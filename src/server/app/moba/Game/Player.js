@@ -16,7 +16,7 @@ module.exports = class MobaPlayer extends Player {
 		this.updatesUntilAuto = 0
 		this.actions = null
 		this.levelNext = null
-		this.chatAt = null
+		this.chatAt = 0
 		this.actions = []
 	}
 
