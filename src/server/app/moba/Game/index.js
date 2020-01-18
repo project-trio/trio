@@ -132,7 +132,7 @@ class MobaGame extends Game {
 				error = 'Game closed'
 			}
 			if (error) {
-				data = { error: error }
+				data = { error }
 				this.remove(socket)
 			} else {
 				data = { gid: this.id, hostID: this.hostID, mode: this.mode, size: this.size, map: this.map, ready: this.canStart(), players: this.formattedPlayers() }
@@ -157,18 +157,17 @@ class MobaGame extends Game {
 		console.log('ERR unable to remove deleted game', this.id)
 	}
 
-	requiredNumberOfActivePlayers () {
-		return this.botMode ? 1 : this.size - 1
+	requiredMinimumNumberOfActivePlayers () {
+		return this.botMode ? 1 : Math.max(1, this.size - 1)
 	}
 
 	remove (socket) {
 		if (super.remove(socket)) {
-			return true
+			return
 		}
 
 		if (!this.isStarted()) {
 			this.broadcast('players', { ready: this.canStart(), players: this.formattedPlayers() })
-			return true
 		}
 	}
 

@@ -25,15 +25,13 @@ module.exports = class Player {
 		game.players.push(this)
 	}
 
-	removeFromGame (game) {
+	removeFromGame () {
 		if (this.bot) {
 			return
 		}
 		this.user.gameData.id = null
-		this.socket.leave(game.id)
-		if (this.game === game) {
-			this.socket.player = null
-		}
+		this.socket.leave(this.game.id)
+		this.socket.player = null
 	}
 
 }

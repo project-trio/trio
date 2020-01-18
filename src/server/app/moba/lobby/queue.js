@@ -19,7 +19,7 @@ class Queuer {
 		this.chatAt = 0
 	}
 
-	remove (index) {
+	removeIndex (index) {
 		this.socket.queuer = null
 		if (index === undefined) {
 			index = queuers.indexOf(this)
@@ -61,7 +61,7 @@ module.exports = {
 		for (let idx = 0; idx < queuers.length; idx += 1) {
 			const queuer = queuers[idx]
 			if (queuer.isReadyPressed && queuer.queueMin <= size) {
-				if (queuer.remove(idx)) {
+				if (queuer.removeIndex(idx)) {
 					idx -= 1
 				}
 				if (queuer.queueMap) {
@@ -125,7 +125,7 @@ module.exports = {
 						if (queuer.queueMin <= size) {
 							const wasReady = queuer.isReadyPressed
 							if (!wasReady) {
-								queuer.remove(idx)
+								queuer.removeIndex(idx)
 							}
 							queuer.socket.emit('queue expired', { error: wasReady ? 'A player did not confirm the ready check. They have been removed from the queue.' : 'You failed to confirm the ready check and have been removed from the queue.', backToLobby: !wasReady })
 						}
@@ -159,7 +159,7 @@ module.exports = {
 		socket.leave('queue')
 		const queuer = socket.queuer
 		if (queuer) {
-			queuer.remove(undefined)
+			queuer.removeIndex(undefined)
 			this.update()
 		}
 	},

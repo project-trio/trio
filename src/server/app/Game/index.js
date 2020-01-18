@@ -45,7 +45,7 @@ class Game {
 	destroy () {
 		this.destroyed = true
 		for (const player of this.players) {
-			player.removeFromGame(this)
+			player.removeFromGame()
 		}
 		this.players = []
 	}
@@ -81,7 +81,7 @@ class Game {
 	}
 
 	hasEnoughPlayersToContinue () {
-		const minActiveCount = this.requiredNumberOfActivePlayers()
+		const minActiveCount = this.requiredMinimumNumberOfActivePlayers()
 		let count = 0
 		for (const player of this.players) {
 			if (player.joinCompleted) {
@@ -94,7 +94,7 @@ class Game {
 		return false
 	}
 	
-	requiredNumberOfActivePlayers () {
+	requiredMinimumNumberOfActivePlayers () {
 		return 1
 	}
 
@@ -106,13 +106,11 @@ class Game {
 			if (this.isPlaying()) {
 				player.joinCompleted = false
 			} else {
-				player.removeFromGame(this)
+				player.removeFromGame()
 				this.players.splice(leaveIndex, 1)
-				console.log('Player left', pid, this.id)
 			}
 			if (!this.hasEnoughPlayersToContinue()) {
-				this.destroy()
-				return true
+				return this.destroy()
 			}
 			this.broadcast('update player', { pid, joined: false })
 		}

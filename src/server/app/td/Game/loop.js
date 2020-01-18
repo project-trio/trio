@@ -32,8 +32,8 @@ const loop = function () {
 			states[pidx] = player.send
 			player.send = {}
 		}
-		let wave = null
-		const winners = []
+		let waveNumber = null
+		const waveWinners = []
 		if (bestWaveTime) {
 			const sendResult = !game.sendWaveResult
 			game.sendWaveResult = sendResult
@@ -42,23 +42,23 @@ const loop = function () {
 					const player = gamePlayers[pidx]
 					if (player.waveNumber === game.waveCheck && player.waveDuration === bestWaveTime) {
 						player.wavesWon += 1
-						winners.push(pidx)
+						waveWinners.push(pidx)
 					}
 				}
-				wave = game.waveCheck
+				waveNumber = game.waveCheck
 				game.waveCheck = game.waveNumber
 				if (game.waveCheck > game.waves) {
 					game.wavesFinished = true
 					game.finish()
 				}
 			} else {
-				wave = game.waveNumber
+				waveNumber = game.waveNumber
 				game.waveNumber += 1
 				game.duration += bestWaveTime + UPDATE_DURATION * 1.5
 			}
 		}
 
-		const actions = [ wave, winners.length ? winners : null ]
+		const actions = [ waveNumber, waveWinners.length ? waveWinners : null ]
 		const isFinished = game.isFinished()
 		if (isFinished) {
 			game.broadcastsPlaying = false
