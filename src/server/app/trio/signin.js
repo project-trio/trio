@@ -1,19 +1,19 @@
 const request = require('request')
 
-const CommonValidator = require.main.require('../common/validator')
-const { now } = require.main.require('../common/utils')
+const CommonValidator = require('@/common/validator')
+const { getTimestamp } = require('@/common/utils')
 
-const live = require.main.require('./helpers/live')
-const mailer = require.main.require('./helpers/mailer')
+const live = require('@/server/helpers/live')
+const mailer = require('@/server/helpers/mailer')
 
-const Activity = require.main.require('./models/activity')
-const User = require.main.require('./models/user')
-const Session = require.main.require('./models/session')
+const Activity = require('@/server/models/activity')
+const User = require('@/server/models/user')
+const Session = require('@/server/models/session')
 
 async function makePasscode (user, callback) {
 	const email = user.email
 	const passcodeAt = user.passcode_at
-	if (passcodeAt && now() - passcodeAt < 60) {
+	if (passcodeAt && getTimestamp() - passcodeAt < 60) {
 		return callback({ userID: user.id, skipped: true })
 	}
 	const passcodeCreation = await User.makePasscode(user)
@@ -68,7 +68,7 @@ async function passcodeSignin (socket, user, data, callback) {
 	}
 	let error, erasePasscode = false
 	const passcodeAt = user.passcode_at
-	if (!passcodeAt || now() > passcodeAt + 4 * 60 * 60) {
+	if (!passcodeAt || getTimestamp() > passcodeAt + 4 * 60 * 60) {
 		error = 'Passcode expired'
 		erasePasscode = true
 	} else if (user.passcode_attempts >= 4) {

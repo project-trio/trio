@@ -1,15 +1,15 @@
-const { TESTING } = require.main.require('../common/constants')
+const { TESTING } = require('@/common/constants')
 const { TICK_DURATION, UPDATE_DURATION, VERSION } = require('../config')
 
-const { displayTime } = require.main.require('./helpers/util')
+const { displayTime } = require('@/server/helpers/util')
 
-const Game = require.main.require('./app/Game')
+const Game = require('@/server/app/Game')
 
 const TDPlayer = require('./Player')
 
-const ActivityModel = require.main.require('./models/activity')
-const GameModel = require.main.require('./models/game')
-const UserModel = require.main.require('./models/user')
+const ActivityModel = require('@/server/models/activity')
+const GameModel = require('@/server/models/game')
+const UserModel = require('@/server/models/user')
 
 //CONSTRUCTOR
 

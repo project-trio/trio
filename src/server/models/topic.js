@@ -1,4 +1,4 @@
-const db = require.main.require('./helpers/db')
+const db = require('@/server/helpers/db')
 
 module.exports = {
 

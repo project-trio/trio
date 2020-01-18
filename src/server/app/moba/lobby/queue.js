@@ -1,4 +1,4 @@
-const { now, randomItem } = require.main.require('../common/utils')
+const { getTimestamp, randomItem } = require('@/common/utils')
 
 const MobaGame = require('../Game')
 
@@ -117,7 +117,7 @@ module.exports = {
 				}
 				queuePendingForSize = size
 				const pendingDuration = 20
-				queuePopAt = now() + pendingDuration
+				queuePopAt = getTimestamp() + pendingDuration
 				queueExpiredTimeout = setTimeout(() => {
 					queuePendingForSize = null
 					for (let idx = queuers.length - 1; idx >= 0; idx -= 1) {

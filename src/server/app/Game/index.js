@@ -1,6 +1,6 @@
-const { TESTING } = require.main.require('../common/constants')
+const { TESTING } = require('@/common/constants')
 
-const { uid } = require.main.require('./helpers/util')
+const { uid } = require('@/server/helpers/util')
 
 const MAX_IDLE_UPDATES = TESTING ? 1000 : 1000
 

@@ -1,7 +1,7 @@
-const live = require.main.require('./helpers/live')
+const live = require('@/server/helpers/live')
 
-const Session = require.main.require('./models/session')
-const User = require.main.require('./models/user')
+const Session = require('@/server/models/session')
+const User = require('@/server/models/user')
 
 const authError = (next, redirect, error) => {
 	return next(new Error(redirect ? process.env.BASE_URL : error))

@@ -1,4 +1,4 @@
-const Player = require.main.require('./app/Game/Player')
+const Player = require('@/server/app/Game/Player')
 
 module.exports = class TDPlayer extends Player {
 

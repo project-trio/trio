@@ -1,6 +1,6 @@
-const { randomItem } = require.main.require('../common/utils')
+const { randomItem } = require('@/common/utils')
 
-const Player = require.main.require('./app/Game/Player')
+const Player = require('@/server/app/Game/Player')
 
 const Config = require('../config')
 

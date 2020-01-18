@@ -1,3 +1,7 @@
+require('module-alias/register')
+
+//DOTENV
+
 const dotenv = require('dotenv')
 
 dotenv.config({ path: 'src/server/config/.env' })
@@ -20,7 +24,7 @@ require('./app/trio')(io)
 require('./app/td')(io)
 require('./app/moba')(io)
 
-require.main.require('./helpers/live').init(io)
+require('@/server/helpers/live').init(io)
 
 //APP
 

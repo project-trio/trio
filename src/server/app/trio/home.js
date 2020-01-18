@@ -1,7 +1,7 @@
-const live = require.main.require('./helpers/live')
-const middleware = require.main.require('./helpers/middleware')
+const live = require('@/server/helpers/live')
+const middleware = require('@/server/helpers/middleware')
 
-const Activity = require.main.require('./models/activity')
+const Activity = require('@/server/models/activity')
 
 module.exports = (socket) => {
 	middleware.page(socket, 'home', (data, callback) => {

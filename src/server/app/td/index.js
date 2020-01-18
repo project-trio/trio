@@ -1,4 +1,4 @@
-const middleware = require.main.require('./helpers/middleware')
+const middleware = require('@/server/helpers/middleware')
 
 const lobbyEvents = require('./events/lobby')
 const playEvents = require('./events/play')

@@ -1,4 +1,4 @@
-const middleware = require.main.require('./helpers/middleware')
+const middleware = require('@/server/helpers/middleware')
 
 // const { VERSION } = require('./config')
 

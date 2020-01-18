@@ -1,6 +1,6 @@
-const { TESTING } = require.main.require('../common/constants')
+const { TESTING } = require('@/common/constants')
 
-const middleware = require.main.require('./helpers/middleware')
+const middleware = require('@/server/helpers/middleware')
 
 const home = require('./home')
 const signin = require('./signin')

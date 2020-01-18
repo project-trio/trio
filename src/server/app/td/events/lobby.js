@@ -1,8 +1,8 @@
-const { TESTING } = require.main.require('../common/constants')
-const { randomItem } = require.main.require('../common/utils')
+const { TESTING } = require('@/common/constants')
+const { randomItem } = require('@/common/utils')
 const { MODES } = require('../config')
 
-const live = require.main.require('./helpers/live')
+const live = require('@/server/helpers/live')
 
 const Game = require('../Game')
 

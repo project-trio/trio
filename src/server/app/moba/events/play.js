@@ -1,4 +1,4 @@
-const CommonUtils = require.main.require('../common/utils')
+const { getTimestamp } = require('@/common/utils')
 
 const Config = require('../config')
 
@@ -50,7 +50,7 @@ module.exports = function (io, socket) {
 		if (!chatObject) {
 			response.error = `Not in queue`
 		} else {
-			const updateTime = CommonUtils.now() // player.game.serverUpdate
+			const updateTime = getTimestamp() // player.game.serverUpdate
 			if (updateTime <= chatObject.chatAt + 1) {
 				response.error = 'Chatting too fast!'
 			} else {

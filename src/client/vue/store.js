@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 import { TESTING } from '@/common/constants'
+import { getTimestamp } from '@/common/utils'
 
 import router from '@/client/vue/router'
 
@@ -32,7 +33,7 @@ export default new Vuex.Store({
 			ccid: null,
 			md5: null,
 			admin: false,
-			timeMinutely: Date.now() / 1000,
+			timeMinutely: getTimestamp(),
 		},
 		sessionToken: storage.get('token'),
 		registering: false,
@@ -78,7 +79,7 @@ export default new Vuex.Store({
 
 	mutations: {
 		NOW (state) {
-			state.local.timeMinutely = Date.now() / 1000
+			state.local.timeMinutely = getTimestamp()
 		},
 
 		RECONNECT (state, attempts) {

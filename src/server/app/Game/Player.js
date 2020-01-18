@@ -1,4 +1,4 @@
-const Util = require.main.require('./helpers/util')
+const Util = require('@/server/helpers/util')
 
 module.exports = class Player {
 

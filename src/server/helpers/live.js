@@ -1,4 +1,4 @@
-const { now } = require.main.require('../common/utils')
+const { getTimestamp } = require('@/common/utils')
 
 let trio
 
@@ -9,7 +9,7 @@ let scores = {}
 const gameUsers = {}
 
 const sendUpdate = (user, data) => {
-	const currentTime = now()
+	const currentTime = getTimestamp()
 	if (currentTime > data.at + 5) {
 		data.user = {
 			id: user.id,
@@ -33,16 +33,16 @@ module.exports = {
 	async init (io) {
 		trio = io.of('/trio')
 
-		activities = await require.main.require('./models/activity').latest()
+		activities = await require('@/server/models/activity').latest()
 
-		const topicArray = await require.main.require('./models/topic').latest()
+		const topicArray = await require('@/server/models/topic').latest()
 		for (const topic of topicArray) {
 			topics[topic.id] = topic.name
 		}
 
 		const userIds = new Set()
 
-		const gameModel = require.main.require('./models/game')
+		const gameModel = require('@/server/models/game')
 		const tdNormal = await gameModel.scores(2, 'normal')
 		const tdRandom = await gameModel.scores(2, 'random')
 		scores = {
@@ -65,7 +65,7 @@ module.exports = {
 			}
 		}
 		if (userIds.size) {
-			const activityUsers = await require.main.require('./models/user').all(Array.from(userIds), true)
+			const activityUsers = await require('@/server/models/user').all(Array.from(userIds), true)
 			for (const user of activityUsers) {
 				user.online = 0
 				user.gameData = {
@@ -186,7 +186,7 @@ module.exports = {
 			updateUser = {
 				id: userID,
 				online: existingUser.online,
-				at: now(),
+				at: getTimestamp(),
 				gameData: {
 					topicID: topicID || existingUser.gameData.topicID,
 					id: null,

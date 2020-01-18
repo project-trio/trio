@@ -1,5 +1,5 @@
-const db = require.main.require('./helpers/db')
-const live = require.main.require('./helpers/live')
+const db = require('@/server/helpers/db')
+const live = require('@/server/helpers/live')
 
 module.exports = {
 

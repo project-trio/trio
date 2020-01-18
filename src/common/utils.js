@@ -1,7 +1,7 @@
 module.exports = {
 
-	now () {
-		return Math.round(Date.now() * 0.001)
+	getTimestamp () {
+		return Math.round(Date.now() / 1000)
 	},
 
 	randomItem (array) {

@@ -1,7 +1,7 @@
-const { TESTING } = require.main.require('../common/constants')
+const { TESTING } = require('@/common/constants')
 const { UPDATE_DURATION } = require('../config')
 
-const Game = require.main.require('./app/Game')
+const Game = require('@/server/app/Game')
 
 const MobaPlayer = require('./Player')
 
