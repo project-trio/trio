@@ -134,7 +134,7 @@ class TDGame extends Game {
 		this.state = Game.STATE_FINISHED
 		if (this.singleplayer) {
 			const player = this.players[0]
-			if (player.waveNumber >= this.waves) {
+			if (player.lives > 0 && player.waveNumber >= this.waves) {
 				const user = player.user
 				const score = this.duration
 				const updated = await UserModel.highscore(user, 2, this.mode, score, false)
