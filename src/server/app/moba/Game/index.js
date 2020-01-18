@@ -11,11 +11,11 @@ const games = []
 
 class MobaGame extends Game {
 
-	constructor (io, mode, size, map, autoStart) {
+	constructor (io, mode, teamSize, map, autoStart) {
 		super(io, mode)
 		this.botMode = mode === 'bots'
 		this.tutorialMode = mode === 'tutorial'
-		this.size = size
+		this.size = teamSize
 		this.hostID = null
 		this.autoStart = autoStart
 		this.updatesUntilStart = this.tutorialMode ? 0 : ((TESTING ? 5 : 20) * 1000 / UPDATE_DURATION)
@@ -23,19 +23,19 @@ class MobaGame extends Game {
 
 		if (this.botMode) {
 			const firstTeam = 1 //SAMPLE
-			for (let teamIndex = 0; teamIndex < size; teamIndex += 1) {
+			for (let teamIndex = 0; teamIndex < teamSize; teamIndex += 1) {
 				new MobaPlayer(null, this, firstTeam)
 			}
-			if (TESTING || size >= 10) {
+			if (TESTING || teamSize >= 10) {
 				const secondTeam = 1 - firstTeam
-				for (let teamIndex = 0; teamIndex < size - 1; teamIndex += 1) {
+				for (let teamIndex = 0; teamIndex < teamSize - 1; teamIndex += 1) {
 					new MobaPlayer(null, this, secondTeam)
 				}
 			}
 		}
 
 		this.setMap(map)
-		console.log(this.id, 'Created game', mode, size, map)
+		console.log(this.id, 'Created game', mode, teamSize, map)
 		games.push(this)
 	}
 
@@ -155,6 +155,10 @@ class MobaGame extends Game {
 			}
 		}
 		console.log('ERR unable to remove deleted game', this.id)
+	}
+
+	requiredNumberOfActivePlayers () {
+		return this.botMode ? 1 : this.size - 1
 	}
 
 	remove (socket) {

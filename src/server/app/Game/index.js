@@ -80,13 +80,22 @@ class Game {
 		return null
 	}
 
-	hasJoinedPlayer () {
+	hasEnoughPlayersToContinue () {
+		const minActiveCount = this.requiredNumberOfActivePlayers()
+		let count = 0
 		for (const player of this.players) {
 			if (player.joinCompleted) {
-				return true
+				count += 1
+				if (count >= minActiveCount) {
+					return true
+				}
 			}
 		}
 		return false
+	}
+	
+	requiredNumberOfActivePlayers () {
+		return 1
 	}
 
 	remove (socket) {
@@ -101,7 +110,7 @@ class Game {
 				this.players.splice(leaveIndex, 1)
 				console.log('Player left', pid, this.id)
 			}
-			if (!this.hasJoinedPlayer()) {
+			if (!this.hasEnoughPlayersToContinue()) {
 				this.destroy()
 				return true
 			}
