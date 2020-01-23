@@ -41,7 +41,7 @@ class MobaGame extends Game {
 
 	checkFull () {
 		const playerCount = this.playerCount()
-		return playerCount > 0 && playerCount >= this.size * (this.botMode ? 1 : 2)
+		return playerCount > 0 && playerCount >= this.size * 2
 	}
 
 	//STATE
