@@ -5,7 +5,7 @@ const LobbyQueue = require('../lobby/queue')
 
 const MODE_NAMES = Config.GAME_MODES.map((mode) => mode.name)
 
-const createGame = function (io, socket, mode, size, map, joining, autoStart) {
+const createGame = function (io, socket, mode, size, map, autoStart) {
 	const response = {}
 	if (socket.player) {
 		response.error = 'Already in a game'
@@ -20,13 +20,11 @@ const createGame = function (io, socket, mode, size, map, joining, autoStart) {
 			response.error = 'Invalid game size'
 		} else {
 			const game = new MobaGame(io, mode, size, map, autoStart)
-			if (joining) {
-				const joinData = game.addSocket(socket)
-				if (joinData.error) {
-					game.destroy()
-					response.error = joinData.error
-					response.backToLobby = true
-				}
+			const joinData = game.addSocket(socket)
+			if (joinData.error) {
+				game.destroy()
+				response.error = joinData.error
+				response.backToLobby = true
 			}
 			if (!response.error) {
 				LobbyQueue.broadcastWith(io, false, true)
@@ -47,7 +45,7 @@ const quickJoin = function (io, socket, mode, size, map) {
 			}
 		}
 	}
-	return createGame(io, socket, mode, size, map, true, true)
+	return createGame(io, socket, mode, size, map, true)
 }
 
 const join = function (socket, gid, callback) {
@@ -59,7 +57,7 @@ const join = function (socket, gid, callback) {
 			return !gameData.error
 		}
 	}
-	callback({error: "Game doesn't exist"})
+	callback({ error: `Game doesn't exist` })
 }
 
 module.exports = (io, socket) => {
@@ -91,7 +89,7 @@ module.exports = (io, socket) => {
 
 	socket.on('lobby action', (data, callback) => {
 		const player = socket.player
-		console.log('lobby action', player && player.user.id, data)
+		console.log('lobby action', socket.user.id, data)
 		if (player && data.gid !== player.game.id && player.game.isPlaying()) {
 			console.log('reenter', player.game.id, data.gid)
 			callback({ reenter: player.game.id })
@@ -118,7 +116,7 @@ module.exports = (io, socket) => {
 				const gameResponse = quickJoin(io, socket, data.mode, data.size, data.map)
 				callback(gameResponse)
 			} else if (data.action === 'create') {
-				const gameResponse = createGame(io, socket, data.mode, data.size, data.map, false, false)
+				const gameResponse = createGame(io, socket, data.mode, data.size, data.map, false)
 				callback(gameResponse)
 			} else if (data.action === 'join') {
 				join(socket, data.gid, callback)
