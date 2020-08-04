@@ -19,7 +19,6 @@ class MobaGame extends Game {
 		this.hostID = null
 		this.autoStart = autoStart
 		this.updatesUntilStart = this.tutorialMode ? 0 : ((TESTING ? 5 : 20) * 1000 / UPDATE_DURATION)
-		console.log('this.updatesUntilStart', this.updatesUntilStart)
 
 		if (this.botMode) {
 			const firstTeam = 1 //SAMPLE

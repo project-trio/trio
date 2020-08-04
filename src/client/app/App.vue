@@ -43,7 +43,7 @@ export default {
 		window.addEventListener('focus', this.setCountdown, true)
 	},
 
-	beforeDestroy () {
+	beforeUnmount () {
 		window.removeEventListener('blur', this.cancelCountdown, true)
 		window.removeEventListener('focus', this.setCountdown, true)
 	},
@@ -114,7 +114,7 @@ a {
 /* INPUT */
 
 .button-big {
-	@apply block mx-auto my-2 w-48 h-12 rounded-lg text-white text-2xl font-medium bg-brand-400;
+	@apply block mx-auto my-2 px-4 min-w-48 h-12 rounded-lg text-white text-2xl font-medium bg-brand-400;
 }
 
 .input-big {

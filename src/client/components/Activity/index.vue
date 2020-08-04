@@ -19,8 +19,8 @@
 					{{ targetAsUser ? 'to' : 'in' }}
 					<span v-if="targetAsUser && headingName === fromName">self</span>
 					<router-link v-else :to="{ name: targetRoute, params: { name: headingName } }">{{ headingName }}</router-link>:
-					</span>
-					<span v-else>: </span>
+				</span>
+				<span v-else>: </span>
 				<MarkdownPoi :raw="activity.body" :tag="headingName ? 'div' : 'span'" :inline="!headingName" class="whitespace-pre-wrap" />
 			</span>
 		</div>
