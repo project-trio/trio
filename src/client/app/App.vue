@@ -43,7 +43,7 @@ export default {
 		window.addEventListener('focus', this.setCountdown, true)
 	},
 
-	beforeUnmount () {
+	beforeDestroy () {
 		window.removeEventListener('blur', this.cancelCountdown, true)
 		window.removeEventListener('focus', this.setCountdown, true)
 	},

@@ -12,39 +12,39 @@
 		"deploy": "git -C ../trio-deploy add . && git -C ../trio-deploy commit -m \"🚀\" && git -C ../trio-deploy push dokku master && echo `date`"
 	},
 	"dependencies": {
-		"@sendgrid/mail": "^7.2.2",
+		"@sendgrid/mail": "^7.4.0",
 		"bluebird": "^3.7.2",
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
 		"module-alias": "^2.2.2",
-		"pg-promise": "^10.5.8",
+		"pg-promise": "^10.8.1",
 		"request": "^2.88.2",
 		"socket.io": "^2.3.0"
 	},
 	"devDependencies": {
 		"@fullhuman/postcss-purgecss": "^2.3.0",
-		"@ky-is/eslint-config": "^2.1.0",
+		"@ky-is/eslint-config": "^1.8.2",
 		"@ky-is/tailwind-color-palette": "^1.0.0",
 		"@ky-is/tailwindcss-plugin-width-height": "^1.0.0",
 		"@ky-is/trio-client": "^1.0.0",
 		"@ky-is/vue-markdown-poi": "^1.0.1",
-		"@vue/babel-preset-app": "^4.4.6",
-		"@vue/cli-plugin-babel": "^4.4.6",
-		"@vue/cli-plugin-eslint": "^4.4.6",
-		"@vue/cli-service": "^4.4.6",
+		"@vue/babel-preset-app": "^4.5.9",
+		"@vue/cli-plugin-babel": "^4.5.9",
+		"@vue/cli-plugin-eslint": "^4.5.9",
+		"@vue/cli-service": "^4.5.9",
 		"babel-eslint": "^10.1.0",
-		"core-js": "^3.6.5",
-		"eslint": "^7.6.0",
-		"eslint-plugin-vue": "^7.0.0-beta.1",
+		"core-js": "^3.8.0",
+		"eslint": "^7.14.0",
+		"eslint-plugin-vue": "^7.1.0",
 		"fs-extra": "^9.0.1",
 		"postcss-preset-env": "^6.7.0",
 		"spark-md5": "^3.0.1",
-		"tailwindcss": "^1.6.2",
-		"typescript": "^3.9.7",
-		"vue": "^2.6.11",
-		"vue-router": "^3.3.4",
-		"vue-template-compiler": "^2.6.11",
-		"vuex": "^3.5.1"
+		"tailwindcss": "^1.9.6",
+		"typescript": "^4.1.2",
+		"vue": "^2.6.12",
+		"vue-router": "^3.4.9",
+		"vue-template-compiler": "^2.6.12",
+		"vuex": "^3.6.0"
 	},
 	"babel": {
 		"presets": [
@@ -72,9 +72,13 @@
 	"eslintConfig": {
 		"extends": "@ky-is/eslint-config/vue",
 		"rules": {
-			"vue/html-indent": ["warn", "tab", {
-				"baseIndent": 0
-			}],
+			"vue/html-indent": [
+				"warn",
+				"tab",
+				{
+					"baseIndent": 0
+				}
+			],
 			"vue/require-default-prop": 0
 		}
 	},
