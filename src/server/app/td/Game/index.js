@@ -32,7 +32,7 @@ class TDGame extends Game {
 		this.duration = 0
 		this.startTime = null
 
-		console.log(new Date().toLocaleTimeString(), this.id, 'TD created', this.mode)
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD create', this.mode)
 		games.push(this)
 	}
 
@@ -53,7 +53,7 @@ class TDGame extends Game {
 		if (!socket.player || this.isStarted()) {
 			return
 		}
-		console.log(new Date().toLocaleTimeString(), this.id, 'TD started', this.players.length)
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD start', this.players.length)
 		socket.player.isReadyToStart = true
 		for (const player of this.players) {
 			if (!player.isReadyToStart) {
@@ -80,7 +80,12 @@ class TDGame extends Game {
 		const pid = user.id
 		let player = this.playerById(pid)
 		const isOldPlayer = !!player
-		if (!player) {
+		if (isOldPlayer) {
+			if (socket.player === player) {
+				console.log('Rejoin', socket.id, this.id)
+				return socket.emit('joined game', { gid: this.id })
+			}
+		} else {
 			if (this.isStarted()) {
 				return socket.emit('joined game', { error: `Already playing ${this.id}` })
 			}
@@ -130,7 +135,7 @@ class TDGame extends Game {
 		if (this.isFinished()) {
 			return console.log('ERR', this.id, 'Game already finished')
 		}
-		console.log(new Date().toLocaleTimeString(), this.id, 'TD finished')
+		console.log(new Date().toLocaleTimeString(), this.id, 'TD finish')
 		this.state = Game.STATE_FINISHED
 		if (this.singleplayer) {
 			const player = this.players[0]
@@ -162,7 +167,7 @@ class TDGame extends Game {
 		for (let idx = games.length - 1; idx >= 0; idx -= 1) {
 			if (this === games[idx]) {
 				games.splice(idx, 1)
-				return console.log(new Date().toLocaleTimeString(), this.id, 'TD removed')
+				return console.log(new Date().toLocaleTimeString(), this.id, 'TD destroy')
 			}
 		}
 		console.log('ERR unable to remove deleted game', this.id)

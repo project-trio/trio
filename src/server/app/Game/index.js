@@ -93,7 +93,7 @@ class Game {
 		}
 		return false
 	}
-	
+
 	requiredMinimumNumberOfActivePlayers () {
 		return 1
 	}

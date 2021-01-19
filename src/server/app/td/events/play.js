@@ -9,7 +9,7 @@ module.exports = (io, socket) => {
 	socket.on('player update', (data) => {
 		const player = socket.player
 		if (!player) {
-			return console.log('No player for socket', socket.user, player)
+			return //console.log('No player for socket', socket.user, 'player update')
 		}
 		if (player) {
 			if (data.lives !== undefined) {
@@ -30,7 +30,7 @@ module.exports = (io, socket) => {
 	socket.on('leave game', (gid) => {
 		const player = socket.player
 		if (!player) {
-			return console.log('leave game', 'Not in game', socket.user)
+			return //console.log('leave game', 'Not in game', socket.user)
 		}
 		const game = player.game
 		if (game.id !== gid) {
@@ -42,7 +42,7 @@ module.exports = (io, socket) => {
 	socket.on('wave complete', (data) => {
 		const player = socket.player
 		if (!player) {
-			return console.log('No player for socket', socket.user)
+			return console.log('No player for socket', socket.user, 'wave complete')
 		}
 		const game = player.game
 		if (game.waveCheck !== data.wave) {

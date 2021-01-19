@@ -4,7 +4,7 @@ const { MODES } = require('../config')
 
 const live = require('@/server/helpers/live')
 
-const Game = require('../Game')
+const TDGame = require('../Game')
 
 const QUEUE_WAIT = TESTING ? 6 : 20
 
@@ -47,7 +47,7 @@ module.exports = (io, socket) => {
 			modeVotes = MODES
 		}
 		const mode = randomItem(modeVotes)
-		const game = new Game(io, mode, sockets.length)
+		const game = new TDGame(io, mode, sockets.length)
 		for (const socket of sockets) {
 			leaveQueue(socket)
 			game.addSocket(socket)
@@ -105,12 +105,12 @@ module.exports = (io, socket) => {
 	})
 
 	socket.on('singleplayer', (mode) => {
-		const game = new Game(io, mode, 1)
+		const game = new TDGame(io, mode, 1)
 		game.addSocket(socket)
 	})
 
 	socket.on('join game', (gid) => {
-		for (const game of Game.all) {
+		for (const game of TDGame.all) {
 			if (game.id === gid) {
 				return game.addSocket(socket)
 			}
@@ -122,6 +122,8 @@ module.exports = (io, socket) => {
 		const player = socket.player
 		if (player) {
 			player.game.ready(socket)
+		} else {
+			console.log('No player', socket.id)
 		}
 	})
 
